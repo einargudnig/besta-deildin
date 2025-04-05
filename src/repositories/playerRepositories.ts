@@ -1,4 +1,4 @@
-import db from "./db";
+import db from "../config/database";
 
 export interface Player {
   id: number;
