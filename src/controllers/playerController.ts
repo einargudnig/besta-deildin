@@ -1,10 +1,10 @@
 import type { Context } from "hono";
-import playerRepository from "../repositories/playerRepositories.ts";
+import { playerRepository } from "../repositories/playerRepositories.ts";
 
 export const playerController = {
   async getAllPlayers(c: Context) {
     try {
-      const players = await playerRepository.getAllPlayers();
+      const players = await playerRepository.findAll();
       return c.json({ players });
     } catch (error) {
       console.error("Error fetching players:", error);

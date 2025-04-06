@@ -53,7 +53,7 @@ export const playerRepository = {
 
   async delete(id: number): Promise<boolean> {
     const result = await db.query("DELETE FROM players WHERE id = $1", [id]);
-    return result.rowCount > 0;
+    return result.rowCount !== null && result.rowCount > 0;
   },
 
   async getPlayersByTeam(teamId: number): Promise<Player[]> {
