@@ -7,16 +7,25 @@
     "dev": "bun run --watch src/index.ts",
     "start": "bun run src/index.ts",
     "db:create": "bun run scripts/create-tables.ts",
-    "test": "bun test"
+    "test": "bun test",
+    "test:watch": "bun test --watch",
+    "test:ui": "bun test --ui",
+    "test:coverage": "bun test --coverage",
+    "db:test": "bun run scripts/test-db-connection.ts"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/bun": "latest",
-    "@types/pg": "^8.11.11"
+    "@types/pg": "^8.11.11",
+    "@vitest/ui": "^3.1.1",
+    "msw": "^2.7.3",
+    "vitest": "^3.1.1"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "dotenv": "^16.4.7",
     "hono": "^4.7.5",
     "jose": "^6.0.10",

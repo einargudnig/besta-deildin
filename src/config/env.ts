@@ -5,7 +5,7 @@ config();
 export const env = {
   DATABASE_URL:
     process.env.DATABASE_URL ||
-    "postgres://einargudjonsson:banani.APPELSINA99@localhost:5432/fantasy_football",
+    "database_url",
   JWT_SECRET: process.env.JWT_SECRET || "dev_secret",
   PORT: process.env.PORT || "3000",
   NODE_ENV: process.env.NODE_ENV || "development",
