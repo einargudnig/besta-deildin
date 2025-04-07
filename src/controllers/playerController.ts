@@ -1,5 +1,5 @@
 import type { Context } from "hono";
-import { playerRepository } from "../repositories/playerRepositories.ts";
+import { playerRepository } from "../repositories/playerRepository.ts";
 
 export const playerController = {
   async getAllPlayers(c: Context) {
