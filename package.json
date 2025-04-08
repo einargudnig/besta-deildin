@@ -12,7 +12,8 @@
     "test:ui": "bun test --ui",
     "test:coverage": "bun test --coverage",
     "db:test": "bun run scripts/test-db-connection.ts",
-    "db:setup": "bun run scripts/setup-db.ts"
+    "db:setup": "bun run scripts/setup-db.ts",
+    "db:seed": "bun run scripts/seed-db-mock.ts"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
@@ -30,6 +31,7 @@
     "dotenv": "^16.4.7",
     "hono": "^4.7.5",
     "jose": "^6.0.10",
+    "neverthrow": "^8.2.0",
     "pg": "^8.14.1",
     "pg-pool": "^3.8.0",
     "pino": "^9.6.0",
