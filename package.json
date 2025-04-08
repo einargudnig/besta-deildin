@@ -11,7 +11,8 @@
     "test:watch": "bun test --watch",
     "test:ui": "bun test --ui",
     "test:coverage": "bun test --coverage",
-    "db:test": "bun run scripts/test-db-connection.ts"
+    "db:test": "bun run scripts/test-db-connection.ts",
+    "db:setup": "bun run scripts/setup-db.ts"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
