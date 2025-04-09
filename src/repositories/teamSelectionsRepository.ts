@@ -10,7 +10,7 @@ export interface TeamSelection {
 }
 
 export const teamSelectionRepository = {
-  async getTeamSelection() { },
+  async getTeamSelection() {},
 
   async getTeamSelectionForWeek() { },
 

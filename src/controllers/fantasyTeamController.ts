@@ -1,59 +1,87 @@
 import type { Context } from "hono"
+import { fantasyTeamRepository } from "../repositories/fantasyTeamRepository"
 
 export const fantasyTeamController = {
-  // Fantasy Team repository
+  
   async getUserTeams(c: Context) {
-    try { } catch (error) {
+    try { 
+      const userId = c.req.param('id')
+      const userTeams = await fantasyTeamRepository.getUserTeams(userId)
+      return c.json({ userTeams })
+    } catch (error) {
       console.error("Error fetching users teams")
       return c.json({ message: "Failed fetching user team" })
     }
   },
 
-  // Fantasy team repo
   async createTeam(c: Context) {
-    try { } catch (error) {
+    try { 
+      const userId = c.req.param('id')
+      const teamName = c.req.param('name')
+      const teamBudget = c.req.param('budget')
+      const team = await fantasyTeamRepository.createFantasyTeam(userId, teamName, parseInt(teamBudget))
+      return c.json({ team })
+    } catch (error) {
       console.error("Error creating team")
       return c.json({ message: "Failed creating team" })
     }
   },
 
-  // Fantasy Team repo
   async getTeamById(c: Context) {
-    try { } catch (error) {
+    try { 
+      const teamId = c.req.param('id')
+      const team = await fantasyTeamRepository.getTeamById(teamId)
+      return c.json({ team })
+    } catch (error) {
       console.error("Error fetching team")
       return c.json({ message: "Failed fetching team by id" })
     }
   },
 
-  // Fantasy Team repo
   async updateTeam(c: Context) {
-    try { } catch (error) {
+    try { 
+      const teamId = c.req.param('id')
+      const teamName = c.req.param('name')
+      const teamBudget = c.req.param('budget')
+      const team = await fantasyTeamRepository.updateFantasyTeam(teamId, teamName, parseInt(teamBudget))
+      return c.json({ team })
+    } catch (error) {
       console.error("Error updating team")
       return c.json({ message: "Failed updating team" })
     }
   },
 
-  // Fantasy Team repo
   async deleteTeam(c: Context) {
-    try { } catch (error) {
+    try { 
+      const teamId = c.req.param('id')
+      const team = await fantasyTeamRepository.deleteFantasyTeam(teamId)
+      return c.json({ team })
+    } catch (error) {
       console.error("Error deleting team")
       return c.json({ message: "Failed deleting team" })
     }
   },
 
-  // TeamSelect repo
-  async selectPlayers(c: Context) {
-    try { } catch (error) {
-      console.error("Error selecting players")
-      return c.json({ message: "Failed to select player" })
-    }
-  },
+  // async selectPlayers(c: Context) {
+  //   try { 
+  //     const teamId = c.req.param('id')
+  //     const playerId = c.req.param('playerId')
+  //     const team = await fantasyTeamRepository.selectPlayer(teamId, playerId)
+  //     return c.json({ team })
+  //   } catch (error) {
+  //     console.error("Error selecting players")
+  //     return c.json({ message: "Failed to select player" })
+  //   }
+  // },
 
-  // Fantasy Team repo
-  async getTeamPlayers(c: Context) {
-    try { } catch (error) {
-      console.error("Error getting players team")
-      return c.json({ message: "Error getting team players" })
-    }
-  }
+  // async getTeamPlayers(c: Context) {
+  //   try { 
+  //     const teamId = c.req.param('id')
+  //     const team = await fantasyTeamRepository.getTeamPlayers(teamId)
+  //     return c.json({ team })
+  //   } catch (error) {
+  //     console.error("Error getting players team")
+  //     return c.json({ message: "Error getting team players" })
+  //   }
+  // }
 }

@@ -38,7 +38,7 @@ export const gameweekController = {
   async getGameweekMatches(c: Context) {
     try {
 
-      const gameWeekId = c.req.param('id')
+      const gameWeekId = parseInt(c.req.param('id'))
       const gameWeekMatches = await gameweekRepository.findMatches(gameWeekId)
 
       return c.json({ gameWeekMatches })
