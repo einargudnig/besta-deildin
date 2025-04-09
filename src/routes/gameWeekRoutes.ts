@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { gameweekController } from '../controllers/gameweekController';
+import { gameweekController } from '../controllers/gameWeekController';
 
 const gameweekRoutes = new Hono();
 

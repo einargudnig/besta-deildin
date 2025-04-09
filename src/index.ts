@@ -3,11 +3,11 @@ import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { secureHeaders } from "hono/secure-headers";
 import { env } from "./config/env";
-import authRoutes from "./routes/authRoutes";
+import { authRoutes } from "./routes/authRoutes";
 import { fantasyTeamRoutes } from "./routes/fantasyTeamRoutes";
 import { gameweekRoutes } from "./routes/gameWeekRoutes";
 import { leaderboardRoutes } from "./routes/leaderboardRoutes";
-import playerRoutes from "./routes/playerRoutes";
+import { playerRoutes } from "./routes/playerRoutes";
 import { teamRoutes } from "./routes/teamRoutes";
 // import userRoutes from "./routes/userRoutes";
 
@@ -29,7 +29,6 @@ app.route("/api/fantasy-team", fantasyTeamRoutes);
 app.route("/api/gameweek", gameweekRoutes);
 app.route("/api/leaderboard", leaderboardRoutes);
 // app.route("/api/user", userRoutes);
-// app.route("/api/team", teamRoutes);
 
 console.log("Server starting on port", env.PORT);
 export default { port: env.PORT, fetch: app.fetch };

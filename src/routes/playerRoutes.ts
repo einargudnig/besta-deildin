@@ -9,4 +9,4 @@ playerRoutes.post("/", playerController.createPlayer);
 playerRoutes.put("/:id", playerController.updatePlayer);
 playerRoutes.delete("/:id", playerController.deletePlayer);
 
-export default playerRoutes;
+export { playerRoutes };
