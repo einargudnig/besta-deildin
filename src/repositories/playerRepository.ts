@@ -1,5 +1,5 @@
 import { err, ok, Result } from "neverthrow";
-import db from "../config/database";
+import defaultDb from "../config/database";
 import { DatabaseError, NotFoundError } from "../errors/index";
 
 export interface Player {
@@ -12,7 +12,11 @@ export interface Player {
   total_points: number;
 }
 
-export const playerRepository = {
+export interface Database {
+  query: (text: string, params?: any[]) => Promise<any>;
+}
+
+export const createPlayerRepository = (db: Database = defaultDb) => ({
   async findAll(): Promise<Result<Player[], DatabaseError>> {
     try {
       const result = await db.query("SELECT * FROM players");
@@ -112,4 +116,6 @@ export const playerRepository = {
       return err(new DatabaseError("Failed to get top scorers", { cause: error }));
     }
   },
-};
+});
+
+export const playerRepository = createPlayerRepository();
