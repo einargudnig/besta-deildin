@@ -42,7 +42,7 @@ export const gameweekRepository = {
   
   async getCurrent(startDate: string): Promise<Result<Gameweek, NotFoundError | DatabaseError>> {
     try {
-      const result = await db.query(`SELECT * FROM gameweeks WHERE start_date MATCHES ${startDate}`)
+      const result = await db.query(`SELECT * FROM gameweeks WHERE start_date = $1`, [startDate])
 
       if (result.rows.length === 0) {
         return err(new NotFoundError("Current gameweek not found"))
@@ -57,7 +57,7 @@ export const gameweekRepository = {
   
   async findById(gameWeekId: number): Promise<Result<Gameweek, NotFoundError | DatabaseError>> {
     try {
-      const result = await db.query(`SELECT * FROM gameweeks WHERE gameweek_id MATCHES ${gameWeekId}`)
+      const result = await db.query(`SELECT * FROM gameweeks WHERE gameweek_id = $1`, [gameWeekId])
 
       if (result.rows.length === 0) {
         return err(new NotFoundError(`Game week with id ${gameWeekId} not found`))
@@ -72,7 +72,7 @@ export const gameweekRepository = {
   
   async findMatches(gameWeekId: number): Promise<Result<Matches[], DatabaseError | NotFoundError>> {
     try {
-      const result = await db.query(`SELECT * FROM matches WHERE gameweek_id MATCHES ${gameWeekId}`)
+      const result = await db.query(`SELECT * FROM matches WHERE gameweek_id = $1`, [gameWeekId])
 
       if (result.rows.length === 0) {
         return err(new NotFoundError(`Gameweek with id ${gameWeekId} not found`));
@@ -80,7 +80,7 @@ export const gameweekRepository = {
 
       return ok(result.rows)
     } catch (error) {
-      console.error()
+      console.error("Failed to find matches", error)
       return err(new DatabaseError('Failed to find matches', { cause: error}))
     }
   },
