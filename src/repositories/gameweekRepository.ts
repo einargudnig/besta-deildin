@@ -24,6 +24,7 @@ export interface Matches {
   is_finished: number;
 }
 
+
 export const gameweekRepository = {
   async findAll(): Promise<Result<Gameweek[], NotFoundError| DatabaseError>> {
     try {

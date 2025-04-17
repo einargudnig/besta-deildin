@@ -1,6 +1,6 @@
-import db from "../src/config/database";
 import fs from "fs";
 import path from "path";
+import db from "../src/config/database";
 
 async function createTables() {
   try {

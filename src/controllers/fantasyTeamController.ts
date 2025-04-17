@@ -5,7 +5,8 @@ export const fantasyTeamController = {
   
   async getUserTeams(c: Context) {
     try { 
-      const userId = c.req.param('id')
+      const userId = c.req.json()
+      console.log({ userId }, "user id")
       const userTeams = await fantasyTeamRepository.getUserTeams(userId)
       return c.json({ userTeams })
     } catch (error) {
@@ -16,14 +17,13 @@ export const fantasyTeamController = {
 
   async createTeam(c: Context) {
     try { 
-      const userId = c.req.param('id')
-      const teamName = c.req.param('name')
-      const teamBudget = c.req.param('budget')
-      const team = await fantasyTeamRepository.createFantasyTeam(userId, teamName, parseInt(teamBudget))
+      const createdTeam = await c.req.json()
+      console.log({ createdTeam }, "team in controller")
+      const team = await fantasyTeamRepository.createFantasyTeam(createdTeam)
       return c.json({ team })
     } catch (error) {
-      console.error("Error creating team")
-      return c.json({ message: "Failed creating team" })
+      console.error("Error creating", error)
+      return c.json({ message: "Failed creating team" }, 500)
     }
   },
 

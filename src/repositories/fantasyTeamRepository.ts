@@ -57,10 +57,11 @@ export const fantasyTeamRepository = {
     }
   },
 
-  async createFantasyTeam(userId: string, teamName: string, teamBudget: number): Promise<Result<FantasyTeam, DatabaseError>> {
-    try { 
-      const result = await db.query("INSERT INTO fantasy_teams (user_id, name, budget) VALUES ($1, $2, $3) RETURNING *", [userId, teamName, teamBudget])
-
+  async createFantasyTeam(createdTeam: FantasyTeam): Promise<Result<FantasyTeam, DatabaseError>> {
+    try {
+      console.log({ createdTeam }, "team in repository, inside try block")
+      const result = await db.query("INSERT INTO fantasy_teams (user_id, name, budget) VALUES ($1, $2, $3) RETURNING *", [createdTeam.user_id, createdTeam.name, createdTeam.budget])
+      console.log({ result }, "result in repository")
       if (result.rows.length === 0) {
         return err(new NotFoundError("Failed creating fantasy team"))
       }

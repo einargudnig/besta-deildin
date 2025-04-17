@@ -6,11 +6,11 @@
   "scripts": {
     "dev": "bun run --watch src/index.ts",
     "start": "bun run src/index.ts",
-    "db:create": "bun run scripts/create-tables.ts",
     "test": "bun test",
     "test:watch": "bun test --watch",
     "test:ui": "bun test --ui",
     "test:coverage": "bun test --coverage",
+    "db:create": "bun run scripts/create-tables.ts",
     "db:test": "bun run scripts/test-db-connection.ts",
     "db:setup": "bun run scripts/setup-db.ts",
     "db:seed": "bun run scripts/seed-db-mock.ts"
