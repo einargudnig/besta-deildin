@@ -5,11 +5,12 @@ export const fantasyTeamController = {
   
   async getUserTeams(c: Context) {
     try { 
-      const userId = c.req.json()
+      const userId = await c.req.json()
       console.log({ userId }, "user id")
       const userTeams = await fantasyTeamRepository.getUserTeams(userId)
       return c.json({ userTeams })
     } catch (error) {
+
       console.error("Error fetching users teams")
       return c.json({ message: "Failed fetching user team" })
     }

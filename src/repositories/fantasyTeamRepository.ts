@@ -29,6 +29,7 @@ export const fantasyTeamRepository = {
 
   async getUserTeams(userId: string): Promise<Result<FantasyTeam[], NotFoundError | DatabaseError>> {
     try { 
+      console.log({ userId }, "user id in repository")
       const result = await db.query("SELECT * FROM fantasy_teams WHERE user_id = $1", [userId])
 
       if (result.rows.length === 0) {
