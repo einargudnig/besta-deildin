@@ -8,7 +8,7 @@ fantasyTeamRoutes.post('/', async (c) => fantasyTeamController.createTeam(c));
 fantasyTeamRoutes.get('/:id', fantasyTeamController.getTeamById);
 fantasyTeamRoutes.put('/:id', fantasyTeamController.updateTeam);
 fantasyTeamRoutes.delete('/:id', fantasyTeamController.deleteTeam);
-// fantasyTeamRoutes.post('/:id/select-players', fantasyTeamController.selectPlayers);
+fantasyTeamRoutes.post('/:id/select-player', async (c) => fantasyTeamController.selectPlayer(c));
 // fantasyTeamRoutes.get('/:id/players', fantasyTeamController.getTeamPlayers);
 
 export { fantasyTeamRoutes };

@@ -63,17 +63,17 @@ export const fantasyTeamController = {
     }
   },
 
-  // async selectPlayers(c: Context) {
-  //   try { 
-  //     const teamId = c.req.param('id')
-  //     const playerId = c.req.param('playerId')
-  //     const team = await fantasyTeamRepository.selectPlayer(teamId, playerId)
-  //     return c.json({ team })
-  //   } catch (error) {
-  //     console.error("Error selecting players")
-  //     return c.json({ message: "Failed to select player" })
-  //   }
-  // },
+  async selectPlayer(c: Context) {
+    try { 
+      const selectedPlayer = await c.req.json()
+      console.log({ selectedPlayer }, "selected player")
+      const team = await fantasyTeamRepository.selectPlayer(selectedPlayer)
+      return c.json({ team })
+    } catch (error) {
+      console.error("Error selecting players")
+      return c.json({ message: "Failed to select player" }, 500)
+    }
+  },
 
   // async getTeamPlayers(c: Context) {
   //   try { 

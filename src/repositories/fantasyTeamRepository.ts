@@ -10,6 +10,16 @@ export interface FantasyTeam {
   created_at: number;
 }
 
+export interface SelectedPlayer {
+  id: number;
+  fantasy_team_id: number;
+  gameweek_id: number;
+  player_id: number;
+  is_captain: boolean;
+  is_vice_captain: boolean;
+  is_on_bench: boolean;
+}
+
 export const fantasyTeamRepository = {
   // Might come handy for leaderboards
   async getAllFantasyTeams(): Promise<Result<FantasyTeam[], NotFoundError | DatabaseError>> {
@@ -101,6 +111,21 @@ export const fantasyTeamRepository = {
     } catch (error) {
       console.error("Error deleting fantasy team", error)
       return err(new DatabaseError("Failed to delete fantasy team"))
+    }
+  },
+
+  async selectPlayer(selectedPlayer: SelectedPlayer): Promise<Result<SelectedPlayer, DatabaseError>> {
+    try { 
+      const result = await db.query("INSERT INTO team_selections (id, fantasy_team_id, gameweek_id, player_id, is_captain, is_vice_captain, is_on_bench) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *", [selectedPlayer.id, selectedPlayer.fantasy_team_id, selectedPlayer.gameweek_id, selectedPlayer.player_id, selectedPlayer.is_captain, selectedPlayer.is_vice_captain, selectedPlayer.is_on_bench])
+
+      if (result.rows.length === 0) {
+        return err(new NotFoundError("Failed selecting player"))
+      }
+
+      return ok(result.rows[0]) 
+    } catch (error) {
+      console.error("Error selecting player", error)
+      return err(new DatabaseError("Failed to select player"))
     }
   },
 
