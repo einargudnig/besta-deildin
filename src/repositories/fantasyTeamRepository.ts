@@ -114,6 +114,10 @@ export const fantasyTeamRepository = {
     }
   },
 
+  // TODO: validation
+  // TODO: check if player is already selected
+  // TODO: check if team has enough budget
+  // TODO: check for max players
   async selectPlayer(selectedPlayer: SelectedPlayer): Promise<Result<SelectedPlayer, DatabaseError>> {
     try { 
       const result = await db.query("INSERT INTO team_selections (id, fantasy_team_id, gameweek_id, player_id, is_captain, is_vice_captain, is_on_bench) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *", [selectedPlayer.id, selectedPlayer.fantasy_team_id, selectedPlayer.gameweek_id, selectedPlayer.player_id, selectedPlayer.is_captain, selectedPlayer.is_vice_captain, selectedPlayer.is_on_bench])
@@ -159,4 +163,68 @@ export const fantasyTeamRepository = {
       return err(new DatabaseError("Failed to update fantasy team points"))
     }
   },
+
+  async addPlayerTransaction(
+    fantasyTeamId: number, 
+    playerId: number, 
+    newBudget: number
+  ): Promise<any> {
+    const client = await db.getClient();
+    try {
+      await client.query('BEGIN');
+      
+      // Update team budget
+      await client.query(
+        'UPDATE fantasy_teams SET budget = $1 WHERE id = $2',
+        [newBudget, fantasyTeamId]
+      );
+      
+      // Get current gameweek
+      const gameweekResult = await client.query(
+        'SELECT id FROM gameweeks WHERE is_current = true'
+      );
+      const gameweekId = gameweekResult.rows[0]?.id;
+      
+      // Add player to team selection
+      await client.query(
+        'INSERT INTO team_selections (fantasy_team_id, gameweek_id, player_id) VALUES ($1, $2, $3)',
+        [fantasyTeamId, gameweekId, playerId]
+      );
+      
+      await client.query('COMMIT');
+      
+      // Return updated team
+      const teamResult = await client.query(
+        'SELECT * FROM fantasy_teams WHERE id = $1',
+        [fantasyTeamId]
+      );
+      
+      return teamResult.rows[0];
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
+  },
+  
+  async getTeamSelection(fantasyTeamId: number): Promise<any[]> {
+    // Get current gameweek
+    const gameweekResult = await db.query(
+      'SELECT id FROM gameweeks WHERE is_current = true'
+    );
+    const gameweekId = gameweekResult.rows[0]?.id;
+    
+    // Get team selection with player details
+    const result = await db.query(`
+      SELECT p.*, t.name as team_name, ts.is_captain, ts.is_vice_captain
+      FROM team_selections ts
+      JOIN players p ON ts.player_id = p.id
+      JOIN teams t ON p.team_id = t.id
+      WHERE ts.fantasy_team_id = $1 AND ts.gameweek_id = $2
+    `, [fantasyTeamId, gameweekId]);
+    
+    return result.rows;
+  }
+
 }

@@ -1,5 +1,7 @@
 import type { Context } from "hono"
+import { DatabaseError, NotFoundError } from "../errors"
 import { fantasyTeamRepository } from "../repositories/fantasyTeamRepository"
+import { fantasyTeamService, InsufficientBudgetError, PositionLimitError, TeamLimitError } from "../services/fantasyTeamService"
 
 export const fantasyTeamController = {
   
@@ -60,6 +62,70 @@ export const fantasyTeamController = {
     } catch (error) {
       console.error("Error deleting team")
       return c.json({ message: "Failed deleting team" })
+    }
+  },
+
+  async addPlayer(c: Context) {
+    try {
+      const addPlayer = await c.req.json()
+      console.log({ addPlayer })
+      const fantasyTeamId = addPlayer.fantasy_team_id
+      const playerId = addPlayer.player_id
+      // const userId = parseInt(c.get('user').sub);
+      const isCaptain = addPlayer.is_captain
+      const isViceCaptain = addPlayer.is_vice_captain
+      const isOnBench = addPlayer.is_on_bench
+      
+      if (isNaN(fantasyTeamId) || isNaN(playerId)) {
+        return c.json({ error: 'Invalid team ID or player ID' }, 400);
+      }
+      
+      const result = await fantasyTeamService.addPlayerToTeam(
+        fantasyTeamId, 
+        playerId,
+        isCaptain,
+        isViceCaptain,
+        isOnBench
+      );
+      
+      return result.match(
+        // Success case
+        (data) => {
+          return c.json({ 
+            success: true, 
+            message: 'Player added successfully',
+            team: data
+          });
+        },
+        // Error case
+        (error) => {
+          if (error instanceof InsufficientBudgetError) {
+            return c.json({ error: error.message }, 400);
+          }
+          
+          if (error instanceof PositionLimitError) {
+            return c.json({ error: error.message }, 400);
+          }
+          
+          if (error instanceof TeamLimitError) {
+            return c.json({ error: error.message }, 400);
+          }
+          
+          if (error instanceof NotFoundError) {
+            return c.json({ error: error.message }, 404);
+          }
+          
+          if (error instanceof DatabaseError) {
+            return c.json({ error: error.message }, 500);
+          }
+          
+          console.error('Error adding player:', error);
+          return c.json({ error: 'Failed to add player to team' }, 500);
+        }
+      );
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      return c.json({ error: 'An unexpected error occurred' }, 500);
     }
   },
 
