@@ -1,7 +1,7 @@
-import { afterAll, afterEach, beforeAll } from "bun:test";
+import { afterAll, afterEach, beforeAll } from 'bun:test';
 
 interface MockResponseInit {
-  body: any;
+  body: unknown;
   status: number;
   headers?: Record<string, string>;
 }
@@ -23,16 +23,13 @@ const mockFetch = async (input: string | URL | Request, init?: RequestInit): Pro
   const url = typeof input === 'string' ? input : input.toString();
   const mockResponse = mockResponses.get(url);
   if (mockResponse) {
-    return new Response(
-      JSON.stringify(mockResponse.body),
-      {
-        status: mockResponse.status,
-        headers: {
-          'Content-Type': 'application/json',
-          ...(mockResponse.headers || {})
-        }
-      }
-    );
+    return new Response(JSON.stringify(mockResponse.body), {
+      status: mockResponse.status,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(mockResponse.headers || {}),
+      },
+    });
   }
   return originalFetch(input, init);
 };

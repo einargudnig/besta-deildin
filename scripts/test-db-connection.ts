@@ -5,7 +5,7 @@ async function testConnection() {
     console.log('Testing database connection...');
     const result = await db.query('SELECT NOW()');
     console.log('Connection successful! Current time:', result.rows[0].now);
-    
+
     // Try to list tables
     const tables = await db.query(`
       SELECT table_name 
@@ -13,7 +13,7 @@ async function testConnection() {
       WHERE table_schema = 'public'
       ORDER BY table_name;
     `);
-    
+
     console.log('Tables in database:');
     if (tables.rows.length === 0) {
       console.log('No tables found. Database is empty.');

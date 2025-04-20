@@ -1,4 +1,4 @@
-import { err, ok, Result } from 'neverthrow';
+import { type Result, err, ok } from 'neverthrow';
 import db from '../config/database';
 import { DatabaseError, NotFoundError } from '../errors';
 
@@ -39,9 +39,12 @@ export const leaderboardRepository = {
     }
   },
 
-  async getGameweekLeaderboard(gameweekId: number): Promise<Result<Leaderboard[], DatabaseError | NotFoundError>> {
+  async getGameweekLeaderboard(
+    gameweekId: number
+  ): Promise<Result<Leaderboard[], DatabaseError | NotFoundError>> {
     try {
-      const result = await db.query(`
+      const result = await db.query(
+        `
         SELECT 
           ft.id as team_id,
           ft.name,
@@ -59,7 +62,9 @@ export const leaderboardRepository = {
           GROUP BY fantasy_team_id
         ) ts ON ft.id = ts.fantasy_team_id
         ORDER BY rank
-      `, [gameweekId]);
+      `,
+        [gameweekId]
+      );
 
       if (result.rows.length === 0) {
         return err(new NotFoundError('No leaderboard entries found for this gameweek'));

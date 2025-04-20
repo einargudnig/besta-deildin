@@ -1,4 +1,4 @@
-import { err, ok, Result } from 'neverthrow';
+import { type Result, err, ok } from 'neverthrow';
 import db from '../config/database';
 import { DatabaseError, NotFoundError } from '../errors';
 
@@ -13,12 +13,13 @@ export interface TeamSelection {
 }
 
 export const teamSelectionRepository = {
-  async getTeamSelection(teamId: number): Promise<Result<TeamSelection[], DatabaseError | NotFoundError>> {
+  async getTeamSelection(
+    teamId: number
+  ): Promise<Result<TeamSelection[], DatabaseError | NotFoundError>> {
     try {
-      const result = await db.query(
-        'SELECT * FROM team_selections WHERE fantasy_team_id = $1',
-        [teamId]
-      );
+      const result = await db.query('SELECT * FROM team_selections WHERE fantasy_team_id = $1', [
+        teamId,
+      ]);
 
       if (result.rows.length === 0) {
         return err(new NotFoundError('No team selections found for this team'));
@@ -31,7 +32,10 @@ export const teamSelectionRepository = {
     }
   },
 
-  async getTeamSelectionForWeek(teamId: number, gameweekId: number): Promise<Result<TeamSelection[], DatabaseError | NotFoundError>> {
+  async getTeamSelectionForWeek(
+    teamId: number,
+    gameweekId: number
+  ): Promise<Result<TeamSelection[], DatabaseError | NotFoundError>> {
     try {
       const result = await db.query(
         'SELECT * FROM team_selections WHERE fantasy_team_id = $1 AND gameweek_id = $2',
@@ -49,7 +53,11 @@ export const teamSelectionRepository = {
     }
   },
 
-  async selectPlayer(playerId: number, teamId: number, gameweekId: number): Promise<Result<TeamSelection, DatabaseError>> {
+  async selectPlayer(
+    playerId: number,
+    teamId: number,
+    gameweekId: number
+  ): Promise<Result<TeamSelection, DatabaseError>> {
     try {
       const result = await db.query(
         'INSERT INTO team_selections (fantasy_team_id, gameweek_id, player_id, is_captain, is_vice_captain, is_on_bench) VALUES ($1, $2, $3, false, false, false) RETURNING *',
@@ -62,7 +70,11 @@ export const teamSelectionRepository = {
     }
   },
 
-  async makeViceCaptain(playerId: number, teamId: number, gameweekId: number): Promise<Result<TeamSelection, DatabaseError>> {
+  async makeViceCaptain(
+    playerId: number,
+    teamId: number,
+    gameweekId: number
+  ): Promise<Result<TeamSelection, DatabaseError>> {
     try {
       // First, remove vice captain from any other player
       await db.query(
@@ -82,7 +94,11 @@ export const teamSelectionRepository = {
     }
   },
 
-  async moveToBench(playerId: number, teamId: number, gameweekId: number): Promise<Result<TeamSelection, DatabaseError>> {
+  async moveToBench(
+    playerId: number,
+    teamId: number,
+    gameweekId: number
+  ): Promise<Result<TeamSelection, DatabaseError>> {
     try {
       const result = await db.query(
         'UPDATE team_selections SET is_on_bench = true WHERE player_id = $1 AND fantasy_team_id = $2 AND gameweek_id = $3 RETURNING *',
@@ -95,7 +111,11 @@ export const teamSelectionRepository = {
     }
   },
 
-  async moveToStarting(playerId: number, teamId: number, gameweekId: number): Promise<Result<TeamSelection, DatabaseError>> {
+  async moveToStarting(
+    playerId: number,
+    teamId: number,
+    gameweekId: number
+  ): Promise<Result<TeamSelection, DatabaseError>> {
     try {
       const result = await db.query(
         'UPDATE team_selections SET is_on_bench = false WHERE player_id = $1 AND fantasy_team_id = $2 AND gameweek_id = $3 RETURNING *',

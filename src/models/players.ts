@@ -8,7 +8,7 @@ export interface Player {
   total_points: number;
 }
 
-export type CreatePlayerDTO = Omit<Player, "id" | "total_points"> & {
+export type CreatePlayerDTO = Omit<Player, 'id' | 'total_points'> & {
   total_points?: number;
 };
 export type UpdatePlayerDTO = Partial<CreatePlayerDTO>;

@@ -1,16 +1,16 @@
-import { beforeEach, describe, expect, test } from "bun:test";
-import type { QueryResult } from "pg";
-import { DatabaseError, NotFoundError } from "../../src/errors";
-import type { Database } from "../../src/repositories/playerRepository";
-import { createPlayerRepository } from "../../src/repositories/playerRepository";
+import { beforeEach, describe, expect, test } from 'bun:test';
+import type { QueryResult } from 'pg';
+import { DatabaseError, NotFoundError } from '../../src/errors';
+import type { Database } from '../../src/repositories/playerRepository';
+import { createPlayerRepository } from '../../src/repositories/playerRepository';
 
-describe("Player Repository", () => {
+describe('Player Repository', () => {
   const mockPlayer = {
     id: 1,
-    first_name: "John",
-    last_name: "Doe",
+    first_name: 'John',
+    last_name: 'Doe',
     team_id: 1,
-    position: "Forward",
+    position: 'Forward',
     price: 100,
     total_points: 10,
   };
@@ -23,7 +23,7 @@ describe("Player Repository", () => {
       query: async (): Promise<QueryResult> => ({
         rows: [],
         rowCount: 0,
-        command: "",
+        command: '',
         oid: 0,
         fields: [],
       }),
@@ -31,12 +31,12 @@ describe("Player Repository", () => {
     playerRepository = createPlayerRepository(mockDb);
   });
 
-  describe("findAll", () => {
-    test("should return all players", async () => {
+  describe('findAll', () => {
+    test('should return all players', async () => {
       mockDb.query = async (): Promise<QueryResult> => ({
         rows: [mockPlayer],
         rowCount: 1,
-        command: "SELECT",
+        command: 'SELECT',
         oid: 0,
         fields: [],
       });
@@ -47,9 +47,9 @@ describe("Player Repository", () => {
       expect(result._unsafeUnwrap()).toEqual([mockPlayer]);
     });
 
-    test("should handle database error", async () => {
+    test('should handle database error', async () => {
       mockDb.query = async () => {
-        throw new Error("Database error");
+        throw new Error('Database error');
       };
 
       const result = await playerRepository.findAll();
@@ -59,12 +59,12 @@ describe("Player Repository", () => {
     });
   });
 
-  describe("findById", () => {
-    test("should return player by id", async () => {
+  describe('findById', () => {
+    test('should return player by id', async () => {
       mockDb.query = async (): Promise<QueryResult> => ({
         rows: [mockPlayer],
         rowCount: 1,
-        command: "SELECT",
+        command: 'SELECT',
         oid: 0,
         fields: [],
       });
@@ -75,11 +75,11 @@ describe("Player Repository", () => {
       expect(result._unsafeUnwrap()).toEqual(mockPlayer);
     });
 
-    test("should return NotFoundError when player not found", async () => {
+    test('should return NotFoundError when player not found', async () => {
       mockDb.query = async (): Promise<QueryResult> => ({
         rows: [],
         rowCount: 0,
-        command: "SELECT",
+        command: 'SELECT',
         oid: 0,
         fields: [],
       });
@@ -90,9 +90,9 @@ describe("Player Repository", () => {
       expect(result._unsafeUnwrapErr()).toBeInstanceOf(NotFoundError);
     });
 
-    test("should handle database error", async () => {
+    test('should handle database error', async () => {
       mockDb.query = async () => {
-        throw new Error("Database error");
+        throw new Error('Database error');
       };
 
       const result = await playerRepository.findById(1);
@@ -102,13 +102,13 @@ describe("Player Repository", () => {
     });
   });
 
-  describe("create", () => {
-    test("should create a new player", async () => {
+  describe('create', () => {
+    test('should create a new player', async () => {
       const newPlayer = {
-        first_name: "John",
-        last_name: "Doe",
+        first_name: 'John',
+        last_name: 'Doe',
         team_id: 1,
-        position: "Forward",
+        position: 'Forward',
         price: 100,
         total_points: 10,
       };
@@ -116,7 +116,7 @@ describe("Player Repository", () => {
       mockDb.query = async (): Promise<QueryResult> => ({
         rows: [mockPlayer],
         rowCount: 1,
-        command: "INSERT",
+        command: 'INSERT',
         oid: 0,
         fields: [],
       });
@@ -127,16 +127,16 @@ describe("Player Repository", () => {
       expect(result._unsafeUnwrap()).toEqual(mockPlayer);
     });
 
-    test("should handle database error", async () => {
+    test('should handle database error', async () => {
       mockDb.query = async () => {
-        throw new Error("Database error");
+        throw new Error('Database error');
       };
 
       const result = await playerRepository.create({
-        first_name: "John",
-        last_name: "Doe",
+        first_name: 'John',
+        last_name: 'Doe',
         team_id: 1,
-        position: "Forward",
+        position: 'Forward',
         price: 100,
         total_points: 10,
       });
@@ -146,13 +146,13 @@ describe("Player Repository", () => {
     });
   });
 
-  describe("update", () => {
-    test("should update player", async () => {
-      const updateData = { first_name: "Updated" };
+  describe('update', () => {
+    test('should update player', async () => {
+      const updateData = { first_name: 'Updated' };
       mockDb.query = async (): Promise<QueryResult> => ({
         rows: [{ ...mockPlayer, ...updateData }],
         rowCount: 1,
-        command: "UPDATE",
+        command: 'UPDATE',
         oid: 0,
         fields: [],
       });
@@ -163,24 +163,24 @@ describe("Player Repository", () => {
       expect(result._unsafeUnwrap()).toEqual({ ...mockPlayer, ...updateData });
     });
 
-    test("should handle database error", async () => {
+    test('should handle database error', async () => {
       mockDb.query = async () => {
-        throw new Error("Database error");
+        throw new Error('Database error');
       };
 
-      const result = await playerRepository.update(1, { first_name: "Updated" });
+      const result = await playerRepository.update(1, { first_name: 'Updated' });
 
       expect(result.isErr()).toBe(true);
       expect(result._unsafeUnwrapErr()).toBeInstanceOf(DatabaseError);
     });
   });
 
-  describe("delete", () => {
-    test("should delete player", async () => {
+  describe('delete', () => {
+    test('should delete player', async () => {
       mockDb.query = async (): Promise<QueryResult> => ({
         rows: [],
         rowCount: 1,
-        command: "DELETE",
+        command: 'DELETE',
         oid: 0,
         fields: [],
       });
@@ -191,9 +191,9 @@ describe("Player Repository", () => {
       expect(result._unsafeUnwrap()).toBe(true);
     });
 
-    test("should handle database error", async () => {
+    test('should handle database error', async () => {
       mockDb.query = async () => {
-        throw new Error("Database error");
+        throw new Error('Database error');
       };
 
       const result = await playerRepository.delete(1);
@@ -203,12 +203,12 @@ describe("Player Repository", () => {
     });
   });
 
-  describe("getPlayersByTeam", () => {
-    test("should return players by team", async () => {
+  describe('getPlayersByTeam', () => {
+    test('should return players by team', async () => {
       mockDb.query = async (): Promise<QueryResult> => ({
         rows: [mockPlayer],
         rowCount: 1,
-        command: "SELECT",
+        command: 'SELECT',
         oid: 0,
         fields: [],
       });
@@ -219,9 +219,9 @@ describe("Player Repository", () => {
       expect(result._unsafeUnwrap()).toEqual([mockPlayer]);
     });
 
-    test("should handle database error", async () => {
+    test('should handle database error', async () => {
       mockDb.query = async () => {
-        throw new Error("Database error");
+        throw new Error('Database error');
       };
 
       const result = await playerRepository.getPlayersByTeam(1);
@@ -231,12 +231,12 @@ describe("Player Repository", () => {
     });
   });
 
-  describe("getTopScorers", () => {
-    test("should return top scorers", async () => {
+  describe('getTopScorers', () => {
+    test('should return top scorers', async () => {
       mockDb.query = async (): Promise<QueryResult> => ({
         rows: [mockPlayer],
         rowCount: 1,
-        command: "SELECT",
+        command: 'SELECT',
         oid: 0,
         fields: [],
       });
@@ -247,9 +247,9 @@ describe("Player Repository", () => {
       expect(result._unsafeUnwrap()).toEqual([mockPlayer]);
     });
 
-    test("should handle database error", async () => {
+    test('should handle database error', async () => {
       mockDb.query = async () => {
-        throw new Error("Database error");
+        throw new Error('Database error');
       };
 
       const result = await playerRepository.getTopScorers(10);
@@ -258,4 +258,4 @@ describe("Player Repository", () => {
       expect(result._unsafeUnwrapErr()).toBeInstanceOf(DatabaseError);
     });
   });
-}); 
+});

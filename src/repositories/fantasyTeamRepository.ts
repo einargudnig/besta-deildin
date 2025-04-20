@@ -1,7 +1,7 @@
-import { Result, err, ok } from "neverthrow";
-import db from "../config/database";
-import { DatabaseError, NotFoundError } from "../errors";
-export interface FantasyTeam { 
+import { type Result, err, ok } from 'neverthrow';
+import db from '../config/database';
+import { DatabaseError, NotFoundError } from '../errors';
+export interface FantasyTeam {
   id: number;
   user_id: string;
   name: string;
@@ -23,94 +23,108 @@ export interface SelectedPlayer {
 export const fantasyTeamRepository = {
   // Might come handy for leaderboards
   async getAllFantasyTeams(): Promise<Result<FantasyTeam[], NotFoundError | DatabaseError>> {
-    try { 
-      const result = await db.query("SELECT * FROM fantasy_teams")
+    try {
+      const result = await db.query('SELECT * FROM fantasy_teams');
 
       if (result.rows.length === 0) {
-        return err(new NotFoundError("Failed finding fantasy teams"))
+        return err(new NotFoundError('Failed finding fantasy teams'));
       }
 
-      return ok(result.rows)
+      return ok(result.rows);
     } catch (error) {
-      console.error("Error fetching all fantasy teams", error)
-      return err(new DatabaseError("Failed to fetch all fantasy teams"))
+      console.error('Error fetching all fantasy teams', error);
+      return err(new DatabaseError('Failed to fetch all fantasy teams'));
     }
   },
 
-  async getUserTeams(userId: string): Promise<Result<FantasyTeam[], NotFoundError | DatabaseError>> {
-    try { 
-      console.log({ userId }, "user id in repository")
-      const result = await db.query("SELECT * FROM fantasy_teams WHERE user_id = $1", [userId])
+  async getUserTeams(
+    userId: string
+  ): Promise<Result<FantasyTeam[], NotFoundError | DatabaseError>> {
+    try {
+      console.log({ userId }, 'user id in repository');
+      const result = await db.query('SELECT * FROM fantasy_teams WHERE user_id = $1', [userId]);
 
       if (result.rows.length === 0) {
-        return err(new NotFoundError("Failed finding fantasy teams"))
+        return err(new NotFoundError('Failed finding fantasy teams'));
       }
 
-      return ok(result.rows)
+      return ok(result.rows);
     } catch (error) {
-      console.error("Error fetching user teams", error)
-      return err(new DatabaseError("Failed to fetch user teams"))
+      console.error('Error fetching user teams', error);
+      return err(new DatabaseError('Failed to fetch user teams'));
     }
   },
 
   async getTeamById(teamId: string): Promise<Result<FantasyTeam, NotFoundError | DatabaseError>> {
-    try { 
-      const result = await db.query("SELECT * FROM fantasy_teams WHERE id = $1", [teamId])
+    try {
+      const result = await db.query('SELECT * FROM fantasy_teams WHERE id = $1', [teamId]);
 
       if (result.rows.length === 0) {
-        return err(new NotFoundError("Failed finding fantasy team"))
+        return err(new NotFoundError('Failed finding fantasy team'));
       }
 
-      return ok(result.rows[0])
+      return ok(result.rows[0]);
     } catch (error) {
-      console.error("Error fetching team by id", error)
-      return err(new DatabaseError("Failed to fetch team by id"))
+      console.error('Error fetching team by id', error);
+      return err(new DatabaseError('Failed to fetch team by id'));
     }
   },
 
   async createFantasyTeam(createdTeam: FantasyTeam): Promise<Result<FantasyTeam, DatabaseError>> {
     try {
-      console.log({ createdTeam }, "team in repository, inside try block")
-      const result = await db.query("INSERT INTO fantasy_teams (user_id, name, budget) VALUES ($1, $2, $3) RETURNING *", [createdTeam.user_id, createdTeam.name, createdTeam.budget])
-      console.log({ result }, "result in repository")
+      console.log({ createdTeam }, 'team in repository, inside try block');
+      const result = await db.query(
+        'INSERT INTO fantasy_teams (user_id, name, budget) VALUES ($1, $2, $3) RETURNING *',
+        [createdTeam.user_id, createdTeam.name, createdTeam.budget]
+      );
+      console.log({ result }, 'result in repository');
       if (result.rows.length === 0) {
-        return err(new NotFoundError("Failed creating fantasy team"))
+        return err(new NotFoundError('Failed creating fantasy team'));
       }
 
-      return ok(result.rows[0])
+      return ok(result.rows[0]);
     } catch (error) {
-      console.error("Error creating fantasy team", error)
-      return err(new DatabaseError("Failed to create fantasy team"))
+      console.error('Error creating fantasy team', error);
+      return err(new DatabaseError('Failed to create fantasy team'));
     }
   },
-  
-  async updateFantasyTeam(teamId: string, teamName: string, teamBudget: number): Promise<Result<FantasyTeam, DatabaseError>> {
-    try { 
-      const result = await db.query("UPDATE fantasy_teams SET name = $1, budget = $2 WHERE id = $3 RETURNING *", [teamName, teamBudget, teamId])
+
+  async updateFantasyTeam(
+    teamId: string,
+    teamName: string,
+    teamBudget: number
+  ): Promise<Result<FantasyTeam, DatabaseError>> {
+    try {
+      const result = await db.query(
+        'UPDATE fantasy_teams SET name = $1, budget = $2 WHERE id = $3 RETURNING *',
+        [teamName, teamBudget, teamId]
+      );
 
       if (result.rows.length === 0) {
-        return err(new NotFoundError("Failed updating fantasy team"))
+        return err(new NotFoundError('Failed updating fantasy team'));
       }
 
-      return ok(result.rows[0])
+      return ok(result.rows[0]);
     } catch (error) {
-      console.error("Error updating fantasy team", error)
-      return err(new DatabaseError("Failed to update fantasy team"))
+      console.error('Error updating fantasy team', error);
+      return err(new DatabaseError('Failed to update fantasy team'));
     }
   },
-  
+
   async deleteFantasyTeam(teamId: string): Promise<Result<FantasyTeam, DatabaseError>> {
-    try { 
-      const result = await db.query("DELETE FROM fantasy_teams WHERE id = $1 RETURNING *", [teamId])
+    try {
+      const result = await db.query('DELETE FROM fantasy_teams WHERE id = $1 RETURNING *', [
+        teamId,
+      ]);
 
       if (result.rows.length === 0) {
-        return err(new NotFoundError("Failed deleting fantasy team"))
+        return err(new NotFoundError('Failed deleting fantasy team'));
       }
 
-      return ok(result.rows[0])
+      return ok(result.rows[0]);
     } catch (error) {
-      console.error("Error deleting fantasy team", error)
-      return err(new DatabaseError("Failed to delete fantasy team"))
+      console.error('Error deleting fantasy team', error);
+      return err(new DatabaseError('Failed to delete fantasy team'));
     }
   },
 
@@ -118,88 +132,110 @@ export const fantasyTeamRepository = {
   // TODO: check if player is already selected
   // TODO: check if team has enough budget
   // TODO: check for max players
-  async selectPlayer(selectedPlayer: SelectedPlayer): Promise<Result<SelectedPlayer, DatabaseError>> {
-    try { 
-      const result = await db.query("INSERT INTO team_selections (id, fantasy_team_id, gameweek_id, player_id, is_captain, is_vice_captain, is_on_bench) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *", [selectedPlayer.id, selectedPlayer.fantasy_team_id, selectedPlayer.gameweek_id, selectedPlayer.player_id, selectedPlayer.is_captain, selectedPlayer.is_vice_captain, selectedPlayer.is_on_bench])
+  async selectPlayer(
+    selectedPlayer: SelectedPlayer
+  ): Promise<Result<SelectedPlayer, DatabaseError>> {
+    try {
+      const result = await db.query(
+        'INSERT INTO team_selections (id, fantasy_team_id, gameweek_id, player_id, is_captain, is_vice_captain, is_on_bench) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+        [
+          selectedPlayer.id,
+          selectedPlayer.fantasy_team_id,
+          selectedPlayer.gameweek_id,
+          selectedPlayer.player_id,
+          selectedPlayer.is_captain,
+          selectedPlayer.is_vice_captain,
+          selectedPlayer.is_on_bench,
+        ]
+      );
 
       if (result.rows.length === 0) {
-        return err(new NotFoundError("Failed selecting player"))
+        return err(new NotFoundError('Failed selecting player'));
       }
 
-      return ok(result.rows[0]) 
+      return ok(result.rows[0]);
     } catch (error) {
-      console.error("Error selecting player", error)
-      return err(new DatabaseError("Failed to select player"))
+      console.error('Error selecting player', error);
+      return err(new DatabaseError('Failed to select player'));
     }
   },
 
   // TODO: might have separate increase and decrease functions?
-  async updateFantasyTeamBudget(teamId: string, amount: number): Promise<Result<FantasyTeam, DatabaseError>> {
-    try { 
-      const result = await db.query("UPDATE fantasy_teams SET budget = budget + $1 WHERE id = $2 RETURNING *", [amount, teamId])
+  async updateFantasyTeamBudget(
+    teamId: string,
+    amount: number
+  ): Promise<Result<FantasyTeam, DatabaseError>> {
+    try {
+      const result = await db.query(
+        'UPDATE fantasy_teams SET budget = budget + $1 WHERE id = $2 RETURNING *',
+        [amount, teamId]
+      );
 
       if (result.rows.length === 0) {
-        return err(new NotFoundError("Failed updating fantasy team budget"))
+        return err(new NotFoundError('Failed updating fantasy team budget'));
       }
 
-      return ok(result.rows[0])
+      return ok(result.rows[0]);
     } catch (error) {
-      console.error("Error updating fantasy team budget", error)
-      return err(new DatabaseError("Failed to update fantasy team budget"))
-    }
-  },
-  
-  async updateFantasyTeamPoints(teamId: string, points: number): Promise<Result<FantasyTeam, DatabaseError>> {
-    try { 
-      const result = await db.query("UPDATE fantasy_teams SET total_points = $1 WHERE id = $2 RETURNING *", [points, teamId])
-
-      if (result.rows.length === 0) {
-        return err(new NotFoundError("Failed updating fantasy team points"))
-      }
-
-      return ok(result.rows[0])
-    } catch (error) {
-      console.error("Error updating fantasy team points", error)
-      return err(new DatabaseError("Failed to update fantasy team points"))
+      console.error('Error updating fantasy team budget', error);
+      return err(new DatabaseError('Failed to update fantasy team budget'));
     }
   },
 
-  async addPlayerTransaction(
-    fantasyTeamId: number, 
-    playerId: number, 
+  async updateFantasyTeamPoints(
+    teamId: string,
+    points: number
+  ): Promise<Result<FantasyTeam, DatabaseError>> {
+    try {
+      const result = await db.query(
+        'UPDATE fantasy_teams SET total_points = $1 WHERE id = $2 RETURNING *',
+        [points, teamId]
+      );
+
+      if (result.rows.length === 0) {
+        return err(new NotFoundError('Failed updating fantasy team points'));
+      }
+
+      return ok(result.rows[0]);
+    } catch (error) {
+      console.error('Error updating fantasy team points', error);
+      return err(new DatabaseError('Failed to update fantasy team points'));
+    }
+  },
+
+  async updateTeamBudget(
+    teamId: number,
+    playerId: number,
     newBudget: number
-  ): Promise<any> {
+  ): Promise<{ success: boolean }> {
     const client = await db.getClient();
     try {
       await client.query('BEGIN');
-      
+
       // Update team budget
-      await client.query(
-        'UPDATE fantasy_teams SET budget = $1 WHERE id = $2',
-        [newBudget, fantasyTeamId]
-      );
-      
+      await client.query('UPDATE fantasy_teams SET budget = $1 WHERE id = $2', [
+        newBudget,
+        teamId,
+      ]);
+
       // Get current gameweek
-      const gameweekResult = await client.query(
-        'SELECT id FROM gameweeks WHERE is_current = true'
-      );
+      const gameweekResult = await client.query('SELECT id FROM gameweeks WHERE is_current = true');
       const gameweekId = gameweekResult.rows[0]?.id;
-      
+
       // Add player to team selection
       await client.query(
         'INSERT INTO team_selections (fantasy_team_id, gameweek_id, player_id) VALUES ($1, $2, $3)',
-        [fantasyTeamId, gameweekId, playerId]
+        [teamId, gameweekId, playerId]
       );
-      
+
       await client.query('COMMIT');
-      
+
       // Return updated team
-      const teamResult = await client.query(
-        'SELECT * FROM fantasy_teams WHERE id = $1',
-        [fantasyTeamId]
-      );
-      
-      return teamResult.rows[0];
+      const teamResult = await client.query('SELECT * FROM fantasy_teams WHERE id = $1', [
+        teamId,
+      ]);
+
+      return { success: teamResult.rows.length > 0 };
     } catch (error) {
       await client.query('ROLLBACK');
       throw error;
@@ -207,24 +243,24 @@ export const fantasyTeamRepository = {
       client.release();
     }
   },
-  
-  async getTeamSelection(fantasyTeamId: number): Promise<any[]> {
+
+  async getTeamSelection(fantasyTeamId: number): Promise<{ id: number; player_id: number; is_on_bench: boolean }[]> {
     // Get current gameweek
-    const gameweekResult = await db.query(
-      'SELECT id FROM gameweeks WHERE is_current = true'
-    );
+    const gameweekResult = await db.query('SELECT id FROM gameweeks WHERE is_current = true');
     const gameweekId = gameweekResult.rows[0]?.id;
-    
+
     // Get team selection with player details
-    const result = await db.query(`
+    const result = await db.query(
+      `
       SELECT p.*, t.name as team_name, ts.is_captain, ts.is_vice_captain
       FROM team_selections ts
       JOIN players p ON ts.player_id = p.id
       JOIN teams t ON p.team_id = t.id
       WHERE ts.fantasy_team_id = $1 AND ts.gameweek_id = $2
-    `, [fantasyTeamId, gameweekId]);
-    
-    return result.rows;
-  }
+    `,
+      [fantasyTeamId, gameweekId]
+    );
 
-}
+    return result.rows;
+  },
+};

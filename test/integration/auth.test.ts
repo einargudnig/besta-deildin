@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from "bun:test";
+import { beforeEach, describe, expect, it } from 'bun:test';
 import { clearMockResponses, setMockResponse } from '../setup';
 
 interface AuthResponse {
@@ -22,12 +22,12 @@ interface LoginRequest {
 const baseUrl = 'http://localhost:3000';
 
 describe('Authentication API Integration', () => {
-  let authToken: string = '';
-  
+  let authToken = '';
+
   beforeEach(() => {
     clearMockResponses();
   });
-  
+
   it('should register a new user', async () => {
     // Setup mock response
     setMockResponse(`${baseUrl}/api/auth/register`, {
@@ -54,19 +54,19 @@ describe('Authentication API Integration', () => {
         password: 'password123',
       }),
     });
-    
-    const data = await response.json() as AuthResponse;
-    
+
+    const data = (await response.json()) as AuthResponse;
+
     expect(response.status).toBe(201);
     expect(data.user).toBeDefined();
     expect(data.token).toBeDefined();
-    
+
     // Save token for next test
     if (data.token) {
       authToken = data.token;
     }
   });
-  
+
   it('should login with valid credentials', async () => {
     // Setup mock response
     setMockResponse(`${baseUrl}/api/auth/login`, {
@@ -92,14 +92,14 @@ describe('Authentication API Integration', () => {
         password: 'password123',
       }),
     });
-    
-    const data = await response.json() as AuthResponse;
-    
+
+    const data = (await response.json()) as AuthResponse;
+
     expect(response.status).toBe(200);
     expect(data.user).toBeDefined();
     expect(data.token).toBeDefined();
   });
-  
+
   it('should reject login with invalid credentials', async () => {
     // Setup mock response
     setMockResponse(`${baseUrl}/api/auth/login`, {
@@ -119,13 +119,13 @@ describe('Authentication API Integration', () => {
         password: 'wrongpassword',
       }),
     });
-    
-    const data = await response.json() as AuthResponse;
-    
+
+    const data = (await response.json()) as AuthResponse;
+
     expect(response.status).toBe(401);
     expect(data.error).toBeDefined();
   });
-  
+
   it('should access protected route with valid token', async () => {
     // Setup mock response
     setMockResponse(`${baseUrl}/api/players`, {
@@ -141,16 +141,16 @@ describe('Authentication API Integration', () => {
     const response = await fetch(`${baseUrl}/api/players`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${authToken}`,
+        Authorization: `Bearer ${authToken}`,
       },
     });
-    
-    const data = await response.json() as AuthResponse;
-    
+
+    const data = (await response.json()) as AuthResponse;
+
     expect(response.status).toBe(200);
     expect(data.players).toBeDefined();
   });
-  
+
   it('should reject access to protected route without token', async () => {
     // Setup mock response
     setMockResponse(`${baseUrl}/api/players`, {
@@ -163,9 +163,9 @@ describe('Authentication API Integration', () => {
     const response = await fetch(`${baseUrl}/api/players`, {
       method: 'GET',
     });
-    
-    const data = await response.json() as AuthResponse;
-    
+
+    const data = (await response.json()) as AuthResponse;
+
     expect(response.status).toBe(401);
     expect(data.error).toBeDefined();
   });

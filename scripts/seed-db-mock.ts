@@ -6,7 +6,11 @@ async function seedMockData() {
     const teams = [
       { name: 'Valur Reykjavík', short_name: 'VAL', logo_url: 'https://example.com/valur.png' },
       { name: 'KR Reykjavík', short_name: 'KR', logo_url: 'https://example.com/kr.png' },
-      { name: 'Víkingur Reykjavík', short_name: 'VIK', logo_url: 'https://example.com/vikingur.png' },
+      {
+        name: 'Víkingur Reykjavík',
+        short_name: 'VIK',
+        logo_url: 'https://example.com/vikingur.png',
+      },
       { name: 'Breiðablik', short_name: 'BRE', logo_url: 'https://example.com/breidablik.png' },
       { name: 'FH Hafnarfjörður', short_name: 'FH', logo_url: 'https://example.com/fh.png' },
       { name: 'Stjarnan', short_name: 'STJ', logo_url: 'https://example.com/stjarnan.png' },
@@ -15,7 +19,7 @@ async function seedMockData() {
       { name: 'Fram Reykjavík', short_name: 'FRA', logo_url: 'https://example.com/fram.png' },
       { name: 'Fylkir', short_name: 'FYL', logo_url: 'https://example.com/fylkir.png' },
       { name: 'HK Kópavogur', short_name: 'HK', logo_url: 'https://example.com/hk.png' },
-      { name: 'Leiknir Reykjavík', short_name: 'LEI', logo_url: 'https://example.com/leiknir.png' }
+      { name: 'Leiknir Reykjavík', short_name: 'LEI', logo_url: 'https://example.com/leiknir.png' },
     ];
 
     for (const team of teams) {
@@ -41,16 +45,16 @@ async function seedMockData() {
       for (let i = 0; i < 5; i++) {
         const position = positions[Math.min(i, positions.length - 1)];
         const price = 4.0 + Math.random() * 6.0; // Random price between 4.0 and 10.0
-        
+
         await db.query(
           'INSERT INTO players (first_name, last_name, team_id, position, price, total_points) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (first_name, last_name, team_id) DO NOTHING',
           [
-            `Player${i+1}`,
+            `Player${i + 1}`,
             teamName.split(' ')[0],
             teamId,
             position,
-            parseFloat(price.toFixed(1)),
-            Math.floor(Math.random() * 50) // Random points between 0 and 49
+            Number.parseFloat(price.toFixed(1)),
+            Math.floor(Math.random() * 50), // Random points between 0 and 49
           ]
         );
         playerCount++;
@@ -63,25 +67,18 @@ async function seedMockData() {
     for (let i = 1; i <= 22; i++) {
       const startDate = new Date(currentDate);
       startDate.setDate(currentDate.getDate() + (i - 1) * 7);
-      
+
       const endDate = new Date(startDate);
       endDate.setDate(startDate.getDate() + 2);
-      
+
       const deadlineDate = new Date(startDate);
       deadlineDate.setHours(deadlineDate.getHours() - 1);
-      
+
       const isCurrent = i === 1; // First gameweek is current
-      
+
       await db.query(
         'INSERT INTO gameweeks (name, start_date, end_date, deadline_date, is_current, is_finished) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (name) DO NOTHING',
-        [
-          `Gameweek ${i}`,
-          startDate,
-          endDate,
-          deadlineDate,
-          isCurrent,
-          false
-        ]
+        [`Gameweek ${i}`, startDate, endDate, deadlineDate, isCurrent, false]
       );
     }
     console.log('Inserted 22 gameweeks');
@@ -91,7 +88,7 @@ async function seedMockData() {
     if (gameweekResult.rows.length > 0) {
       const currentGameweekId = gameweekResult.rows[0].id;
       const teamIds = Object.values(teamMap);
-      
+
       // Create 6 matches (12 teams = 6 matches)
       for (let i = 0; i < teamIds.length; i += 2) {
         if (i + 1 < teamIds.length) {
@@ -100,16 +97,10 @@ async function seedMockData() {
           const kickoffTime = new Date(currentDate);
           kickoffTime.setDate(kickoffTime.getDate() + 1);
           kickoffTime.setHours(19, 15, 0, 0); // 19:15 kickoff
-          
+
           await db.query(
             'INSERT INTO matches (gameweek_id, home_team_id, away_team_id, kickoff_time, is_finished) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (gameweek_id, home_team_id, away_team_id) DO NOTHING',
-            [
-              currentGameweekId,
-              homeTeamId,
-              awayTeamId,
-              kickoffTime,
-              false
-            ]
+            [currentGameweekId, homeTeamId, awayTeamId, kickoffTime, false]
           );
         }
       }

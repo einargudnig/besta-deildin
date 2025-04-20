@@ -15,13 +15,13 @@ export const teamController = {
 
   async getTeamById(c: Context) {
     try {
-      const id = parseInt(c.req.param('id'));
+      const id = Number.parseInt(c.req.param('id'));
       const team = await teamRepository.findById(id);
-      
+
       if (!team) {
         return c.json({ error: 'Team not found' }, 404);
       }
-      
+
       return c.json({ team });
     } catch (error) {
       console.error('Error fetching team:', error);
@@ -31,18 +31,18 @@ export const teamController = {
 
   async getTeamPlayers(c: Context) {
     try {
-      const teamId = parseInt(c.req.param('id'));
+      const teamId = Number.parseInt(c.req.param('id'));
       const team = await teamRepository.findById(teamId);
-      
+
       if (!team) {
         return c.json({ error: 'Team not found' }, 404);
       }
-      
+
       const players = await playerRepository.getPlayersByTeam(teamId);
       return c.json({ team, players });
     } catch (error) {
       console.error('Error fetching team players:', error);
       return c.json({ error: 'Failed to fetch team players' }, 500);
     }
-  }
+  },
 };

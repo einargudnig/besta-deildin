@@ -13,9 +13,13 @@
     "db:create": "bun run scripts/create-tables.ts",
     "db:test": "bun run scripts/test-db-connection.ts",
     "db:setup": "bun run scripts/setup-db.ts",
-    "db:seed": "bun run scripts/seed-db-mock.ts"
+    "db:seed": "bun run scripts/seed-db-mock.ts",
+    "format": "biome format --write .",
+    "lint": "biome lint .",
+    "check": "biome check --apply ."
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
     "@types/bcrypt": "^5.0.2",
     "@types/bun": "latest",
     "@types/pg": "^8.11.11",

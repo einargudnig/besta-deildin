@@ -8,18 +8,21 @@ async function setupDatabase() {
     user: env.DATABASE_USER,
     password: env.DATABASE_PASSWORD,
     host: env.DATABASE_HOST,
-    port: parseInt(env.DATABASE_PORT),
+    port: Number.parseInt(env.DATABASE_PORT),
     database: 'postgres', // Connect to default postgres database first
   });
 
   try {
     console.log('Setting up database...');
-    
+
     // Check if database exists
-    const dbCheckResult = await pgPool.query(`
+    const dbCheckResult = await pgPool.query(
+      `
       SELECT 1 FROM pg_database WHERE datname = $1
-    `, [env.DATABASE_NAME]);
-    
+    `,
+      [env.DATABASE_NAME]
+    );
+
     // Create database if it doesn't exist
     if (dbCheckResult.rows.length === 0) {
       console.log(`Creating database ${env.DATABASE_NAME}...`);
@@ -28,19 +31,19 @@ async function setupDatabase() {
     } else {
       console.log(`Database ${env.DATABASE_NAME} already exists`);
     }
-    
+
     // Close connection to postgres database
     await pgPool.end();
-    
+
     // Connect to the fantasy_football database
     const dbPool = new Pool({
       user: env.DATABASE_USER,
       password: env.DATABASE_PASSWORD,
       host: env.DATABASE_HOST,
-      port: parseInt(env.DATABASE_PORT),
+      port: Number.parseInt(env.DATABASE_PORT),
       database: env.DATABASE_NAME,
     });
-    
+
     // Create tables
     console.log('Creating tables...');
     const createTablesScript = `
@@ -148,20 +151,20 @@ async function setupDatabase() {
       UNIQUE(league_id, fantasy_team_id)
     );
     `;
-    
+
     // Split the script into individual statements
     const statements = createTablesScript
       .split(';')
-      .map(s => s.trim())
-      .filter(s => s.length > 0);
-    
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0);
+
     // Execute each statement
     for (const statement of statements) {
       await dbPool.query(statement);
     }
-    
+
     console.log('Tables created successfully');
-    
+
     // List tables to verify
     const tablesResult = await dbPool.query(`
       SELECT table_name 
@@ -169,7 +172,7 @@ async function setupDatabase() {
       WHERE table_schema = 'public'
       ORDER BY table_name;
     `);
-    
+
     console.log('Tables in database:');
     if (tablesResult.rows.length === 0) {
       console.log('No tables found. Something went wrong.');
@@ -178,10 +181,10 @@ async function setupDatabase() {
         console.log(`${i + 1}. ${row.table_name}`);
       });
     }
-    
+
     // Close connection
     await dbPool.end();
-    
+
     console.log('Database setup completed successfully');
   } catch (error) {
     console.error('Error setting up database:', error);

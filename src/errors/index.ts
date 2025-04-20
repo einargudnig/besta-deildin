@@ -13,7 +13,10 @@ export class NotFoundError extends Error {
 }
 
 export class ValidationError extends Error {
-  constructor(message: string, public details?: any) {
+  constructor(
+    message: string,
+    public details?: Record<string, unknown>
+  ) {
     super(message);
     this.name = 'ValidationError';
   }
