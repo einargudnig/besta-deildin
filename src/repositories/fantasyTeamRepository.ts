@@ -1,23 +1,24 @@
 import { type Result, err, ok } from 'neverthrow';
 import db from '../config/database';
 import { DatabaseError, NotFoundError } from '../errors';
-export interface FantasyTeam {
-  id: number;
-  user_id: string;
-  name: string;
-  budget: number;
-  total_points: number;
-  created_at: number;
-}
+import {
+  type FantasyTeam,
+  type TeamSelection,
+  fantasyTeamSchema,
+  parseDatabaseResult,
+  parseDatabaseResults,
+  teamSelectionSchema
+} from '../schemas';
 
-export interface SelectedPlayer {
+export type { FantasyTeam, TeamSelection };
+
+export interface TeamSelectionWithPlayer {
   id: number;
-  fantasy_team_id: number;
-  gameweek_id: number;
   player_id: number;
-  is_captain: boolean;
-  is_vice_captain: boolean;
   is_on_bench: boolean;
+  position: string;
+  team_id: number;
+  team_name: string;
 }
 
 export const fantasyTeamRepository = {
@@ -30,7 +31,8 @@ export const fantasyTeamRepository = {
         return err(new NotFoundError('Failed finding fantasy teams'));
       }
 
-      return ok(result.rows);
+      const teams = parseDatabaseResults(fantasyTeamSchema, result.rows);
+      return ok(teams);
     } catch (error) {
       console.error('Error fetching all fantasy teams', error);
       return err(new DatabaseError('Failed to fetch all fantasy teams'));
@@ -48,7 +50,8 @@ export const fantasyTeamRepository = {
         return err(new NotFoundError('Failed finding fantasy teams'));
       }
 
-      return ok(result.rows);
+      const teams = parseDatabaseResults(fantasyTeamSchema, result.rows);
+      return ok(teams);
     } catch (error) {
       console.error('Error fetching user teams', error);
       return err(new DatabaseError('Failed to fetch user teams'));
@@ -57,15 +60,15 @@ export const fantasyTeamRepository = {
 
   async getTeamById(teamId: number): Promise<Result<FantasyTeam, NotFoundError | DatabaseError>> {
     try {
+      console.log({ teamId }, 'team id in repository');
       const result = await db.query('SELECT * FROM fantasy_teams WHERE id = $1', [teamId]);
 
       if (result.rows.length === 0) {
         return err(new NotFoundError('Failed finding fantasy team'));
       }
 
-      console.log({ result }, 'result in repository');
-
-      return ok(result.rows[0]);
+      const team = parseDatabaseResult(fantasyTeamSchema, result.rows[0]);
+      return ok(team);
     } catch (error) {
       console.error('Error fetching team by id', error);
       return err(new DatabaseError('Failed to fetch team by id'));
@@ -79,12 +82,13 @@ export const fantasyTeamRepository = {
         'INSERT INTO fantasy_teams (user_id, name, budget) VALUES ($1, $2, $3) RETURNING *',
         [createdTeam.user_id, createdTeam.name, createdTeam.budget]
       );
-      console.log({ result }, 'result in repository');
+      
       if (result.rows.length === 0) {
         return err(new NotFoundError('Failed creating fantasy team'));
       }
 
-      return ok(result.rows[0]);
+      const team = parseDatabaseResult(fantasyTeamSchema, result.rows[0]);
+      return ok(team);
     } catch (error) {
       console.error('Error creating fantasy team', error);
       return err(new DatabaseError('Failed to create fantasy team'));
@@ -106,7 +110,8 @@ export const fantasyTeamRepository = {
         return err(new NotFoundError('Failed updating fantasy team'));
       }
 
-      return ok(result.rows[0]);
+      const team = parseDatabaseResult(fantasyTeamSchema, result.rows[0]);
+      return ok(team);
     } catch (error) {
       console.error('Error updating fantasy team', error);
       return err(new DatabaseError('Failed to update fantasy team'));
@@ -123,20 +128,17 @@ export const fantasyTeamRepository = {
         return err(new NotFoundError('Failed deleting fantasy team'));
       }
 
-      return ok(result.rows[0]);
+      const team = parseDatabaseResult(fantasyTeamSchema, result.rows[0]);
+      return ok(team);
     } catch (error) {
       console.error('Error deleting fantasy team', error);
       return err(new DatabaseError('Failed to delete fantasy team'));
     }
   },
 
-  // TODO: validation
-  // TODO: check if player is already selected
-  // TODO: check if team has enough budget
-  // TODO: check for max players
   async selectPlayer(
-    selectedPlayer: SelectedPlayer
-  ): Promise<Result<SelectedPlayer, DatabaseError>> {
+    selectedPlayer: TeamSelection
+  ): Promise<Result<TeamSelection, DatabaseError>> {
     try {
       const result = await db.query(
         'INSERT INTO team_selections (id, fantasy_team_id, gameweek_id, player_id, is_captain, is_vice_captain, is_on_bench) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
@@ -155,7 +157,8 @@ export const fantasyTeamRepository = {
         return err(new NotFoundError('Failed selecting player'));
       }
 
-      return ok(result.rows[0]);
+      const player = parseDatabaseResult(teamSelectionSchema, result.rows[0]);
+      return ok(player);
     } catch (error) {
       console.error('Error selecting player', error);
       return err(new DatabaseError('Failed to select player'));
@@ -246,23 +249,24 @@ export const fantasyTeamRepository = {
     }
   },
 
-  async getTeamSelection(fantasyTeamId: number): Promise<{ id: number; player_id: number; is_on_bench: boolean }[]> {
-    // Get current gameweek
-    const gameweekResult = await db.query('SELECT id FROM gameweeks WHERE is_current = true');
-    const gameweekId = gameweekResult.rows[0]?.id;
+  async getCurrentGameweek(): Promise<{ id: number }> {
+    const result = await db.query('SELECT id FROM gameweeks WHERE is_current = true');
+    if (result.rows.length === 0) {
+      throw new Error('No current gameweek found');
+    }
+    return result.rows[0];
+  },
 
-    // Get team selection with player details
+  async getTeamSelection(fantasyTeamId: number): Promise<TeamSelectionWithPlayer[]> {
+    const currentGameweek = await this.getCurrentGameweek();
     const result = await db.query(
-      `
-      SELECT p.*, t.name as team_name, ts.is_captain, ts.is_vice_captain
-      FROM team_selections ts
-      JOIN players p ON ts.player_id = p.id
-      JOIN teams t ON p.team_id = t.id
-      WHERE ts.fantasy_team_id = $1 AND ts.gameweek_id = $2
-    `,
-      [fantasyTeamId, gameweekId]
+      `SELECT ts.id, ts.player_id, ts.is_on_bench, p.position, p.team_id, t.name as team_name
+        FROM team_selections ts
+        JOIN players p ON ts.player_id = p.id
+        JOIN teams t ON p.team_id = t.id
+        WHERE ts.fantasy_team_id = $1 AND ts.gameweek_id = $2`,
+      [fantasyTeamId, currentGameweek.id]
     );
-
     return result.rows;
   },
 };

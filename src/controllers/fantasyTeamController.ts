@@ -96,12 +96,19 @@ export const fantasyTeamController = {
 
   async addPlayer(c: Context) {
     try {
+      // Get user from context (set by auth middleware)
+      const user = c.get('user');
+      if (!user) {
+        return c.json({ error: "User not authenticated" }, 401);
+      }
+      
+      console.log('Using userId from context:', user.id);
+      
       const addPlayer = await c.req.json();
       console.log({ addPlayer });
       
       const fantasyTeamId = await c.req.param('id');
       const playerId = await c.req.param('playerId');
-      // const userId = parseInt(c.get('user').sub);
       const isCaptain = addPlayer.is_captain;
       const isViceCaptain = addPlayer.is_vice_captain;
       const isOnBench = addPlayer.is_on_bench;
@@ -113,6 +120,7 @@ export const fantasyTeamController = {
       const result = await fantasyTeamService.addPlayerToTeam(
         Number(fantasyTeamId),
         Number(playerId),
+        user.id,
         isCaptain,
         isViceCaptain,
         isOnBench
@@ -120,6 +128,7 @@ export const fantasyTeamController = {
 
       console.log({ result }, 'result in controller');
 
+      // Accessing the result, the value or an error!
       return result.match(
         // Success case
         (data) => {
@@ -131,6 +140,7 @@ export const fantasyTeamController = {
         },
         // Error case
         (error) => {
+        console.log({ error }, 'error in controller');
           if (error instanceof InsufficientBudgetError) {
             return c.json({ error: error.message }, 400);
           }

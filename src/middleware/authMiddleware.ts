@@ -31,7 +31,7 @@ export const authMiddleware = async (c: Context, next: Next) => {
 
       // Add user info to context
       c.set('user', {
-        id: payload.sub,
+        id: Number(payload.sub),
         username: payload.username,
         email: payload.email,
         role: payload.role,
