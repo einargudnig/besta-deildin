@@ -2,6 +2,7 @@ import { type Result, err, ok } from 'neverthrow';
 import db from '../config/database';
 import { DatabaseError, NotFoundError } from '../errors';
 import {
+  type CreateTeamSelection,
   type FantasyTeam,
   type TeamSelection,
   fantasyTeamSchema,
@@ -75,12 +76,12 @@ export const fantasyTeamRepository = {
     }
   },
 
-  async createFantasyTeam(createdTeam: FantasyTeam): Promise<Result<FantasyTeam, DatabaseError>> {
+  async createFantasyTeam(createdTeam: Omit<FantasyTeam, 'budget'>): Promise<Result<FantasyTeam, DatabaseError>> {
     try {
       console.log({ createdTeam }, 'team in repository, inside try block');
       const result = await db.query(
         'INSERT INTO fantasy_teams (user_id, name, budget) VALUES ($1, $2, $3) RETURNING *',
-        [createdTeam.user_id, createdTeam.name, createdTeam.budget]
+        [createdTeam.user_id, createdTeam.name, '100.00']
       );
       
       if (result.rows.length === 0) {
@@ -137,13 +138,12 @@ export const fantasyTeamRepository = {
   },
 
   async selectPlayer(
-    selectedPlayer: TeamSelection
+    selectedPlayer: CreateTeamSelection
   ): Promise<Result<TeamSelection, DatabaseError>> {
     try {
       const result = await db.query(
-        'INSERT INTO team_selections (id, fantasy_team_id, gameweek_id, player_id, is_captain, is_vice_captain, is_on_bench) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+        'INSERT INTO team_selections (fantasy_team_id, gameweek_id, player_id, is_captain, is_vice_captain, is_on_bench) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
         [
-          selectedPlayer.id,
           selectedPlayer.fantasy_team_id,
           selectedPlayer.gameweek_id,
           selectedPlayer.player_id,

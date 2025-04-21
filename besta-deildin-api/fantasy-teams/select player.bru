@@ -11,8 +11,8 @@ post {
 }
 
 params:path {
+  playerId: 42
   id: 4
-  playerId: 2
 }
 
 auth:bearer {
@@ -21,8 +21,9 @@ auth:bearer {
 
 body:json {
   {
-    "is_captain": true,
+    "is_captain": false,
     "is_vice_captain": false,
     "is_on_bench": false
-  }
+  } 
+  
 }

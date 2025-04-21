@@ -1,5 +1,5 @@
 import { type Result, err } from 'neverthrow';
-import { type FantasyTeam, type SelectedPlayer, fantasyTeamRepository } from '../repositories/fantasyTeamRepository';
+import { type FantasyTeam, type TeamSelection, fantasyTeamRepository } from '../repositories/fantasyTeamRepository';
 import { playerRepository } from '../repositories/playerRepository';
 
 export class InsufficientBudgetError extends Error {
@@ -35,7 +35,7 @@ export const fantasyTeamService = {
     isViceCaptain: boolean,
     isOnBench: boolean
   ): Promise<
-    Result<SelectedPlayer, InsufficientBudgetError | PositionLimitError | TeamLimitError | Error>
+    Result<TeamSelection, InsufficientBudgetError | PositionLimitError | TeamLimitError | Error>
   > {
     try {
       console.log({ fantasyTeamId }, { playerId }, { isCaptain }, { isViceCaptain }, { isOnBench });
@@ -77,7 +77,7 @@ async function processPlayerAddition(
   isViceCaptain: boolean,
   isOnBench: boolean
 ): Promise<
-  Result<SelectedPlayer, InsufficientBudgetError | PositionLimitError | TeamLimitError | Error>
+  Result<TeamSelection, InsufficientBudgetError | PositionLimitError | TeamLimitError | Error>
 > {
 
   console.log({ fantasyTeam });
@@ -148,7 +148,6 @@ async function processPlayerAddition(
 
   // Use a transaction to ensure both operations succeed or fail together
   const transactionResult = await fantasyTeamRepository.selectPlayer({
-    id: Date.now(), // Temporary ID, will be replaced by database
     fantasy_team_id: fantasyTeam.id,
     gameweek_id: gameweekId,
     player_id: playerId,
@@ -156,6 +155,21 @@ async function processPlayerAddition(
     is_vice_captain: isViceCaptain,
     is_on_bench: isOnBench
   });
+  
+  if (!transactionResult.isOk()) {
+    return transactionResult;
+  }
+
+  // Update the team's budget after successful player addition
+  const updateBudgetResult = await fantasyTeamRepository.updateTeamBudget(
+    fantasyTeam.id,
+    playerId,
+    updatedBudget
+  );
+
+  if (!updateBudgetResult.success) {
+    return err(new Error('Failed to update team budget'));
+  }
   
   return transactionResult;
 }

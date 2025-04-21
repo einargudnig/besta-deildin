@@ -72,7 +72,10 @@ export const fantasyTeamSchema = z.object({
   budget: z.string().transform(val => Number(val)),
   total_points: z.number(),
   created_at: z.date(),
-});
+}).transform(data => ({
+  ...data,
+  budget: Number(data.budget)
+}));
 
 export const teamSelectionSchema = z.object({
   id: z.number(),
@@ -109,13 +112,16 @@ export type Match = z.infer<typeof matchSchema>;
 export type PlayerPerformance = z.infer<typeof playerPerformanceSchema>;
 export type FantasyTeam = z.infer<typeof fantasyTeamSchema>;
 export type TeamSelection = z.infer<typeof teamSelectionSchema>;
+export type CreateTeamSelection = Omit<TeamSelection, 'id'>;
 export type League = z.infer<typeof leagueSchema>;
 export type LeagueMembership = z.infer<typeof leagueMembershipSchema>;
 
 // Helper function to parse database results
 export function parseDatabaseResult<T>(schema: z.ZodType<T>, data: unknown): T {
   try {
-    return schema.parse(data);
+    // First parse the raw data
+    const parsed = schema.parse(data);
+    return parsed;
   } catch (error) {
     if (error instanceof z.ZodError) {
       console.error('Validation error:', error.errors);
