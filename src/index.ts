@@ -23,6 +23,7 @@ app.get('/', (c) => c.json({ status: 'ok', message: 'API is running' }));
 app.route('/api/auth', authRoutes);
 app.route('/api/player', playerRoutes);
 app.route('/api/team', teamRoutes);
+// Authenticated routes
 app.route('/api/fantasy-team', fantasyTeamRoutes);
 // app.route("/api/gameweek", gameweekRoutes);
 // app.route("/api/leaderboard", leaderboardRoutes);

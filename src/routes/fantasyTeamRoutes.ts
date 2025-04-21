@@ -1,7 +1,11 @@
 import { Hono } from 'hono';
 import { fantasyTeamController } from '../controllers/fantasyTeamController';
+import { authMiddleware } from '../middleware/authMiddleware';
 
 const fantasyTeamRoutes = new Hono();
+
+// Apply auth middleware to all routes
+fantasyTeamRoutes.use('*', authMiddleware);
 
 fantasyTeamRoutes.get('/', async (c) => fantasyTeamController.getUserTeams(c));
 fantasyTeamRoutes.post('/', async (c) => fantasyTeamController.createTeam(c));

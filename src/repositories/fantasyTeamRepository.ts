@@ -55,13 +55,15 @@ export const fantasyTeamRepository = {
     }
   },
 
-  async getTeamById(teamId: string): Promise<Result<FantasyTeam, NotFoundError | DatabaseError>> {
+  async getTeamById(teamId: number): Promise<Result<FantasyTeam, NotFoundError | DatabaseError>> {
     try {
       const result = await db.query('SELECT * FROM fantasy_teams WHERE id = $1', [teamId]);
 
       if (result.rows.length === 0) {
         return err(new NotFoundError('Failed finding fantasy team'));
       }
+
+      console.log({ result }, 'result in repository');
 
       return ok(result.rows[0]);
     } catch (error) {

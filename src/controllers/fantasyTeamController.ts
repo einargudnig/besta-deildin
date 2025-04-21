@@ -9,15 +9,37 @@ import {
 } from '../services/fantasyTeamService';
 
 export const fantasyTeamController = {
+  
   async getUserTeams(c: Context) {
     try {
-      const userId = await c.req.json();
-      console.log({ userId }, 'user id');
-      const userTeams = await fantasyTeamRepository.getUserTeams(userId);
-      return c.json({ userTeams });
+      console.log('getUserTeams called');
+      
+      // Get user from context (set by auth middleware)
+      const user = c.get('user');
+      if (!user) {
+        return c.json({ error: "User not authenticated" }, 401);
+      }
+      
+      console.log('Using userId from context:', user.id);
+      
+      const result = await fantasyTeamRepository.getUserTeams(user.id);
+      
+      return result.match(
+        (teams) => c.json({ userTeams: teams }),
+        (error) => {
+          console.error('Error in getUserTeams:', error);
+          if (error instanceof NotFoundError) {
+            return c.json({ message: 'No teams found for this user' }, 404);
+          }
+          if (error instanceof DatabaseError) {
+            return c.json({ message: 'Database error occurred' }, 500);
+          }
+          return c.json({ message: 'Failed fetching user teams' }, 500);
+        }
+      );
     } catch (error) {
-      console.error('Error fetching users teams');
-      return c.json({ message: 'Failed fetching user team' });
+      console.error('Unexpected error in getUserTeams:', error);
+      return c.json({ message: 'An unexpected error occurred' }, 500);
     }
   },
 
@@ -76,8 +98,9 @@ export const fantasyTeamController = {
     try {
       const addPlayer = await c.req.json();
       console.log({ addPlayer });
-      const fantasyTeamId = addPlayer.fantasy_team_id;
-      const playerId = addPlayer.player_id;
+      
+      const fantasyTeamId = await c.req.param('id');
+      const playerId = await c.req.param('playerId');
       // const userId = parseInt(c.get('user').sub);
       const isCaptain = addPlayer.is_captain;
       const isViceCaptain = addPlayer.is_vice_captain;
@@ -88,12 +111,14 @@ export const fantasyTeamController = {
       }
 
       const result = await fantasyTeamService.addPlayerToTeam(
-        fantasyTeamId,
-        playerId,
+        Number(fantasyTeamId),
+        Number(playerId),
         isCaptain,
         isViceCaptain,
         isOnBench
       );
+
+      console.log({ result }, 'result in controller');
 
       return result.match(
         // Success case
@@ -119,11 +144,11 @@ export const fantasyTeamController = {
           }
 
           if (error instanceof NotFoundError) {
-            return c.json({ error: error.message }, 404);
+            return c.json({ error: "Team not found" }, 404);
           }
 
           if (error instanceof DatabaseError) {
-            return c.json({ error: error.message }, 500);
+            return c.json({ error: "Database error" }, 500);
           }
 
           console.error('Error adding player:', error);

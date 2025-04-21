@@ -1,0 +1,28 @@
+meta {
+  name: select player
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:3000/api/fantasy-team/:id/players/:playerId
+  body: json
+  auth: bearer
+}
+
+params:path {
+  id: 4
+  playerId: 2
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwidXNlcm5hbWUiOiJ0ZXN0IFVzZXIiLCJlbWFpbCI6InRlc3RAZW1haWwuY29tIiwicm9sZSI6InVzZXIiLCJpYXQiOjE3NDUxNjM2NDAsImV4cCI6MTc0NTI1MDA0MH0.gOYBXWmxCmgSOSWqjTdoFohQI2h4jiR0hlY3nmr2YvU
+}
+
+body:json {
+  {
+    "is_captain": true,
+    "is_vice_captain": false,
+    "is_on_bench": false
+  }
+}
