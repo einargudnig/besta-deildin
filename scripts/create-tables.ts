@@ -6,7 +6,7 @@ async function createTables() {
   try {
     // Read SQL file
     const sql = fs.readFileSync(
-      path.join(__dirname, '../src/schemas/teams.sql'),
+      path.join(__dirname, '../src/schemas/players.sql'),
       'utf8'
     );
 

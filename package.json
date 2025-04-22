@@ -15,6 +15,7 @@
     "db:setup": "bun run scripts/setup-db.ts",
     "db:seed": "bun run scripts/seed-db-mock.ts",
     "fetch:teams": "bun run scripts/fetch-teams.ts",
+    "fetch:players": "bun run scripts/fetch-players.ts",
     "format": "biome format --write .",
     "lint": "biome lint .",
     "check": "biome check --apply ."

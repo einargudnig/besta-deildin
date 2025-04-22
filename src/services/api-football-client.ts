@@ -1,11 +1,10 @@
 import { config } from '../config';
-import type { TeamsApiResponse } from '../types/api-football';
+import type { PlayersApiResponse, TeamsApiResponse } from '../types/api-football';
 
 const API_BASE_URL = 'https://v3.football.api-sports.io';
 
 // use bun to fetch data, could use axios or fetch
 // but lets test out bun for as much as we can!
-
 
 export class ApiFootballClient {
   private apiKey: string;
@@ -39,6 +38,30 @@ export class ApiFootballClient {
       return data;
     } catch (error) {
       console.error('Error fetching teams:', error);
+      throw error;
+    }
+  }
+
+  async getPlayers(teamId: number, season: number): Promise<PlayersApiResponse> {
+    console.log('Fetching players for team:', teamId, 'and season:', season);
+    try {
+      const url = new URL('/players/squads', API_BASE_URL);
+      url.searchParams.append('team', teamId.toString());
+      // url.searchParams.append('season', season.toString());
+
+      const response = await fetch(url, {
+        headers: this.headers,
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = (await response.json()) as PlayersApiResponse;
+      console.log('Players fetched successfully in api-client:', data.response.length);
+      return data;
+    } catch (error) {
+      console.error('Error fetching players:', error);
       throw error;
     }
   }
