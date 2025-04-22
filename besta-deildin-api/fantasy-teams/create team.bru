@@ -6,6 +6,16 @@ meta {
 
 post {
   url: http://localhost:3000/api/fantasy-team
-  body: none
-  auth: inherit
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwidXNlcm5hbWUiOiJ0ZXN0IFVzZXIiLCJlbWFpbCI6InRlc3RAZW1haWwuY29tIiwicm9sZSI6InVzZXIiLCJpYXQiOjE3NDUxNjM2NDAsImV4cCI6MTc0NTI1MDA0MH0.gOYBXWmxCmgSOSWqjTdoFohQI2h4jiR0hlY3nmr2YvU
+}
+
+body:json {
+  {
+    "name": "team3"
+  }
 }

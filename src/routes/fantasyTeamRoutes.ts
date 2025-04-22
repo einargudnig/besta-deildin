@@ -15,6 +15,6 @@ fantasyTeamRoutes.delete('/:id', fantasyTeamController.deleteTeam);
 // TODO: not sure I need this route if I have the addPlayer route
 fantasyTeamRoutes.post('/:id/select-player', async (c) => fantasyTeamController.selectPlayer(c));
 fantasyTeamRoutes.post('/:id/players/:playerId', async (c) => fantasyTeamController.addPlayer(c));
-// fantasyTeamRoutes.get('/:id/players', fantasyTeamController.getTeamPlayers);
+fantasyTeamRoutes.get('/:id/players', fantasyTeamController.getTeamPlayers);
 
 export { fantasyTeamRoutes };

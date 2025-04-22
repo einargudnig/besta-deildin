@@ -81,7 +81,7 @@ export const fantasyTeamRepository = {
       console.log({ createdTeam }, 'team in repository, inside try block');
       const result = await db.query(
         'INSERT INTO fantasy_teams (user_id, name, budget) VALUES ($1, $2, $3) RETURNING *',
-        [createdTeam.user_id, createdTeam.name, '100.00']
+        [createdTeam.user_id, createdTeam.name, 100.00]
       );
       
       if (result.rows.length === 0) {
@@ -210,42 +210,23 @@ export const fantasyTeamRepository = {
 
   async updateTeamBudget(
     teamId: number,
-    playerId: number,
     newBudget: number
-  ): Promise<{ success: boolean }> {
-    const client = await db.getClient();
+  ): Promise<Result<FantasyTeam, DatabaseError>> {
     try {
-      await client.query('BEGIN');
-
-      // Update team budget
-      await client.query('UPDATE fantasy_teams SET budget = $1 WHERE id = $2', [
-        newBudget,
-        teamId,
-      ]);
-
-      // Get current gameweek
-      const gameweekResult = await client.query('SELECT id FROM gameweeks WHERE is_current = true');
-      const gameweekId = gameweekResult.rows[0]?.id;
-
-      // Add player to team selection
-      await client.query(
-        'INSERT INTO team_selections (fantasy_team_id, gameweek_id, player_id) VALUES ($1, $2, $3)',
-        [teamId, gameweekId, playerId]
+      const result = await db.query(
+        'UPDATE fantasy_teams SET budget = $1 WHERE id = $2 RETURNING *',
+        [newBudget, teamId]
       );
 
-      await client.query('COMMIT');
+      if (result.rows.length === 0) {
+        return err(new NotFoundError('Failed updating team budget'));
+      }
 
-      // Return updated team
-      const teamResult = await client.query('SELECT * FROM fantasy_teams WHERE id = $1', [
-        teamId,
-      ]);
-
-      return { success: teamResult.rows.length > 0 };
+      const team = parseDatabaseResult(fantasyTeamSchema, result.rows[0]);
+      return ok(team);
     } catch (error) {
-      await client.query('ROLLBACK');
-      throw error;
-    } finally {
-      client.release();
+      console.error('Error updating team budget', error);
+      return err(new DatabaseError('Failed to update team budget'));
     }
   },
 

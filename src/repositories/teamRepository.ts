@@ -9,7 +9,7 @@ export interface Team {
 
 export const teamRepository = {
   async findAll(): Promise<Team[]> {
-    const result = await db.query('SELECT * FROM teams ORDER BY name');
+    const result = await db.query('SELECT * FROM teams');
     return result.rows;
   },
 

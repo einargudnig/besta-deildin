@@ -45,8 +45,15 @@ export const fantasyTeamController = {
 
   async createTeam(c: Context) {
     try {
+      // Get user from context (set by auth middleware)
+      const user = c.get('user');
+      if (!user) {
+        return c.json({ error: "User not authenticated" }, 401);
+      }
+
       const createdTeam = await c.req.json();
-      console.log({ createdTeam }, 'team in controller');
+      createdTeam.user_id = user.id;
+      
       const team = await fantasyTeamRepository.createFantasyTeam(createdTeam);
       return c.json({ team });
     } catch (error) {
@@ -183,14 +190,14 @@ export const fantasyTeamController = {
     }
   },
 
-  // async getTeamPlayers(c: Context) {
-  //   try {
-  //     const teamId = c.req.param('id')
-  //     const team = await fantasyTeamRepository.getTeamPlayers(teamId)
-  //     return c.json({ team })
-  //   } catch (error) {
-  //     console.error("Error getting players team")
-  //     return c.json({ message: "Error getting team players" })
-  //   }
-  // }
+  async getTeamPlayers(c: Context) {
+    try {
+      const teamId = c.req.param('id')
+      const team = await fantasyTeamRepository.getTeamSelection(Number(teamId))
+      return c.json({ team })
+    } catch (error) {
+      console.error("Error getting players team")
+      return c.json({ message: "Error getting team players" })
+    }
+  }
 };

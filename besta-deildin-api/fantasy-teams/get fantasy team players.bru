@@ -1,29 +1,19 @@
 meta {
-  name: select player
+  name: get fantasy team players
   type: http
-  seq: 1
+  seq: 5
 }
 
-post {
-  url: http://localhost:3000/api/fantasy-team/:id/players/:playerId
-  body: json
+get {
+  url: http://localhost:3000/api/fantasy-team/:id
+  body: none
   auth: bearer
 }
 
 params:path {
-  playerId: 15
   id: 5
 }
 
 auth:bearer {
   token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwidXNlcm5hbWUiOiJ0ZXN0IFVzZXIiLCJlbWFpbCI6InRlc3RAZW1haWwuY29tIiwicm9sZSI6InVzZXIiLCJpYXQiOjE3NDUxNjM2NDAsImV4cCI6MTc0NTI1MDA0MH0.gOYBXWmxCmgSOSWqjTdoFohQI2h4jiR0hlY3nmr2YvU
-}
-
-body:json {
-  {
-    "is_captain": false,
-    "is_vice_captain": false,
-    "is_on_bench": false
-  } 
-  
 }

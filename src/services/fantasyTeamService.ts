@@ -79,7 +79,6 @@ async function processPlayerAddition(
 ): Promise<
   Result<TeamSelection, InsufficientBudgetError | PositionLimitError | TeamLimitError | Error>
 > {
-
   console.log({ fantasyTeam });
   // 2. Get player details
   const playerResult = await playerRepository.findById(playerId);
@@ -91,9 +90,11 @@ async function processPlayerAddition(
   const player = playerResult.value;
   
   // 3. Check budget constraint
-  if (Number(fantasyTeam.budget) < Number(player.price)) {
-    console.log({ fantasyTeam, player }, 'Are we here?');
-    return err(new InsufficientBudgetError(fantasyTeam.budget, player.price));
+  const playerPrice = Number(player.price);
+  const currentBudget = Number(fantasyTeam.budget);
+  
+  if (currentBudget < playerPrice) {
+    return err(new InsufficientBudgetError(currentBudget, playerPrice));
   }
 
   // 4. Get current team selection
@@ -124,7 +125,6 @@ async function processPlayerAddition(
     const teamName = currentSelection.find(p => p.team_id === player.team_id)?.team_name;
     if (!teamName) {
       return err(new Error('Team name not found'));
-    
     }
     return err(new TeamLimitError(teamName, teamLimit));
   }
@@ -135,10 +135,10 @@ async function processPlayerAddition(
     return err(new Error(`Maximum squad size (${squadLimit}) reached`));
   }
 
-  // 8. All validations passed, add player to team
-  const updatedBudget = fantasyTeam.budget - player.price;
+  // 8. Calculate new budget
+  const updatedBudget = currentBudget - playerPrice;
 
-  // Get current gameweek
+  // 9. Get current gameweek
   const gameweekResult = await fantasyTeamRepository.getCurrentGameweek();
   const gameweekId = gameweekResult.id;
 
@@ -146,7 +146,7 @@ async function processPlayerAddition(
     return err(new Error('No current gameweek found'));
   }
 
-  // Use a transaction to ensure both operations succeed or fail together
+  // 10. Use a transaction to ensure both operations succeed or fail together
   const transactionResult = await fantasyTeamRepository.selectPlayer({
     fantasy_team_id: fantasyTeam.id,
     gameweek_id: gameweekId,
@@ -160,14 +160,13 @@ async function processPlayerAddition(
     return transactionResult;
   }
 
-  // Update the team's budget after successful player addition
+  // 11. Update the team's budget after successful player addition
   const updateBudgetResult = await fantasyTeamRepository.updateTeamBudget(
     fantasyTeam.id,
-    playerId,
     updatedBudget
   );
 
-  if (!updateBudgetResult.success) {
+  if (!updateBudgetResult.isOk()) {
     return err(new Error('Failed to update team budget'));
   }
   

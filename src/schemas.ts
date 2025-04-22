@@ -69,13 +69,10 @@ export const fantasyTeamSchema = z.object({
   id: z.number(),
   user_id: z.number(),
   name: z.string(),
-  budget: z.string().transform(val => Number(val)),
+  budget: z.number(),
   total_points: z.number(),
   created_at: z.date(),
-}).transform(data => ({
-  ...data,
-  budget: Number(data.budget)
-}));
+});
 
 export const teamSelectionSchema = z.object({
   id: z.number(),
