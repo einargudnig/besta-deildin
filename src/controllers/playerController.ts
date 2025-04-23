@@ -28,6 +28,8 @@ export const playerController = {
     }
   },
 
+  async getPlayerStats(c: Context) {},
+
   async createPlayer(c: Context) {
     try {
       const body = await c.req.json();

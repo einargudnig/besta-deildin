@@ -5,6 +5,7 @@ const playerRoutes = new Hono();
 
 playerRoutes.get('/', playerController.getAllPlayers);
 playerRoutes.get('/:id', playerController.getPlayerById);
+playerRoutes.get('/:id/stats', playerController.getPlayerStats);
 playerRoutes.post('/', playerController.createPlayer);
 playerRoutes.put('/:id', playerController.updatePlayer);
 playerRoutes.delete('/:id', playerController.deletePlayer);
