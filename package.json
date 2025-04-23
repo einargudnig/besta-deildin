@@ -16,6 +16,8 @@
     "db:seed": "bun run scripts/seed-db-mock.ts",
     "fetch:teams": "bun run scripts/fetch-teams.ts",
     "fetch:players": "bun run scripts/fetch-players.ts",
+    "update-matches": "bun run src/scripts/update-matches.ts",
+    "start-scheduled-updates": "bun run src/scripts/scheduled-updates.ts",
     "format": "biome format --write .",
     "lint": "biome lint .",
     "check": "biome check --apply ."
@@ -34,12 +36,14 @@
   },
   "dependencies": {
     "@types/mongoose": "^5.11.96",
+    "@types/node-cron": "^3.0.11",
     "bcrypt": "^5.1.1",
     "dotenv": "^16.5.0",
     "hono": "^4.7.7",
     "jose": "^6.0.10",
     "mongoose": "^8.13.2",
     "neverthrow": "^8.2.0",
+    "node-cron": "^3.0.3",
     "pg": "^8.14.1",
     "pg-pool": "^3.8.0",
     "pino": "^9.6.0",

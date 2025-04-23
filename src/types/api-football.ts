@@ -149,4 +149,46 @@ export interface PlayersApiResponse {
     total: number;
   };
   response: SquadResponse[];
+}
+
+export interface Match {
+  id: number;
+  api_id: number;
+  home_team_id: number;
+  away_team_id: number;
+  home_score: number | null;
+  away_score: number | null;
+  status: string;
+  date: string;
+  round: string;
+  season: number;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface MatchesApiResponse {
+  response: Array<{
+    fixture: {
+      id: number;
+      date: string;
+      status: {
+        short: string;
+      };
+    };
+    teams: {
+      home: {
+        id: number;
+      };
+      away: {
+        id: number;
+      };
+    };
+    goals: {
+      home: number | null;
+      away: number | null;
+    };
+    league: {
+      round: string;
+    };
+  }>;
 } 

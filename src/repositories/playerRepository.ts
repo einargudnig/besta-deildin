@@ -40,14 +40,15 @@ export const createPlayerRepository = (db: Database = defaultDb) => ({
   async create(player: Omit<Player, 'id'>): Promise<Result<Player, DatabaseError>> {
     try {
       const result = await db.query(
-        'INSERT INTO players (first_name, last_name, team_id, position, price, total_points) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+        'INSERT INTO players (api_id, team_id, name, age, number, position, photo) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
         [
-          player.first_name,
-          player.last_name,
+          player.api_id,
           player.team_id,
+          player.name,
+          player.age,
+          player.number,
           player.position,
-          player.price,
-          player.total_points,
+          player.photo,
         ]
       );
       const createdPlayer = parseDatabaseResult(playerSchema, result.rows[0]);

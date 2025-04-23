@@ -20,12 +20,15 @@ export const teamSchema = z.object({
 
 export const playerSchema = z.object({
   id: z.number(),
-  first_name: z.string(),
-  last_name: z.string(),
+  api_id: z.number(),
   team_id: z.number(),
-  position: z.enum(['GK', 'DEF', 'MID', 'FWD']),
-  price: z.string().transform(val => Number(val)),
-  total_points: z.number(),
+  name: z.string(),
+  age: z.number().nullable(),
+  number: z.number().nullable(),
+  position: z.string(),
+  photo: z.string().nullable(),
+  created_at: z.date(),
+  updated_at: z.date(),
 });
 
 export const gameweekSchema = z.object({
@@ -40,13 +43,17 @@ export const gameweekSchema = z.object({
 
 export const matchSchema = z.object({
   id: z.number(),
-  gameweek_id: z.number(),
+  api_id: z.number(),
   home_team_id: z.number(),
   away_team_id: z.number(),
-  kickoff_time: z.string().datetime(),
   home_score: z.number().nullable(),
   away_score: z.number().nullable(),
-  is_finished: z.boolean(),
+  status: z.string(),
+  date: z.string(),
+  round: z.string(),
+  season: z.number(),
+  created_at: z.date(),
+  updated_at: z.date(),
 });
 
 export const playerPerformanceSchema = z.object({

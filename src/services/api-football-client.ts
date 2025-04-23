@@ -1,5 +1,5 @@
 import { config } from '../config';
-import type { PlayersApiResponse, TeamsApiResponse } from '../types/api-football';
+import type { MatchesApiResponse, PlayersApiResponse, TeamsApiResponse } from '../types/api-football';
 
 const API_BASE_URL = 'https://v3.football.api-sports.io';
 
@@ -64,5 +64,24 @@ export class ApiFootballClient {
       console.error('Error fetching players:', error);
       throw error;
     }
+  }
+
+  public async getMatches(leagueId: number, season: number): Promise<MatchesApiResponse> {
+    const response = await fetch(
+      `${API_BASE_URL}/fixtures?league=${leagueId}&season=${season}`,
+      {
+        headers: {
+          'x-rapidapi-key': this.apiKey,
+          'x-rapidapi-host': 'v3.football.api-sports.io',
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch matches: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data as MatchesApiResponse;
   }
 }
