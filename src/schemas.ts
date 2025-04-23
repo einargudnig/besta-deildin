@@ -52,6 +52,11 @@ export const matchSchema = z.object({
   date: z.string(),
   round: z.string(),
   season: z.number(),
+  league_id: z.number(),
+  referee: z.string().nullable(),
+  venue_id: z.number().nullable(),
+  venue_name: z.string().nullable(),
+  venue_city: z.string().nullable(),
   created_at: z.date(),
   updated_at: z.date(),
 });

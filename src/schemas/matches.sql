@@ -9,6 +9,11 @@ CREATE TABLE IF NOT EXISTS matches (
     date TIMESTAMP WITH TIME ZONE NOT NULL,
     round VARCHAR(50) NOT NULL,
     season INTEGER NOT NULL,
+    league_id INTEGER NOT NULL,
+    referee VARCHAR(100),
+    venue_id INTEGER,
+    venue_name VARCHAR(100),
+    venue_city VARCHAR(100),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -21,6 +26,9 @@ CREATE INDEX IF NOT EXISTS idx_matches_team_ids ON matches(home_team_id, away_te
 
 -- Create an index on date for faster date-based queries
 CREATE INDEX IF NOT EXISTS idx_matches_date ON matches(date);
+
+-- Create an index on league_id for faster league-based queries
+CREATE INDEX IF NOT EXISTS idx_matches_league_id ON matches(league_id);
 
 -- Create a trigger to update the updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()

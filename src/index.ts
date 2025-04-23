@@ -5,6 +5,7 @@ import { secureHeaders } from 'hono/secure-headers';
 import { env } from './config/env';
 import { authRoutes } from './routes/authRoutes';
 import { fantasyTeamRoutes } from './routes/fantasyTeamRoutes';
+import { matchesRoutes } from './routes/matchesRoutes';
 import { playerRoutes } from './routes/playerRoutes';
 import { teamRoutes } from './routes/teamRoutes';
 // import userRoutes from "./routes/userRoutes";
@@ -25,6 +26,7 @@ app.route('/api/player', playerRoutes);
 app.route('/api/team', teamRoutes);
 // Authenticated routes
 app.route('/api/fantasy-team', fantasyTeamRoutes);
+app.route('/api/matches', matchesRoutes);
 // app.route("/api/gameweek", gameweekRoutes);
 // app.route("/api/leaderboard", leaderboardRoutes);
 // app.route("/api/user", userRoutes);
