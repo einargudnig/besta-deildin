@@ -101,6 +101,7 @@ export class ApiFootballClient {
 
     const url = `${API_BASE_URL}/fixtures/players?fixture=${matchId}&team=${teamId}`;
     const data = await this.makeRequest<unknown>(url);
+    console.log('data', data);
     return PlayerStatsSchema.parse(data);
   }
 }

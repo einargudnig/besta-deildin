@@ -1,5 +1,6 @@
 import type { Context } from 'hono';
 import { playerRepository } from '../repositories/playerRepository.ts';
+import { PlayerStatsService } from '../services/playerStatsService';
 
 export const playerController = {
   async getAllPlayers(c: Context) {
@@ -28,7 +29,34 @@ export const playerController = {
     }
   },
 
-  async getPlayerStats(c: Context) {},
+  async getPlayerStats(c: Context) {
+    try {
+      const playerId = Number.parseInt(c.req.param('id'));
+      const matchId = Number.parseInt(c.req.query('matchId') ?? '0');
+      const teamId = Number.parseInt(c.req.query('teamId') ?? '0');
+
+      if (!matchId || !teamId) {
+        return c.json({ error: 'matchId and teamId are required' }, 400);
+      }
+
+      const playerStatsService = PlayerStatsService.getInstance();
+      const result = await playerStatsService.getPlayerStatsFromMatch(matchId, teamId);
+
+      if (result.isErr()) {
+        return c.json({ error: result.error.message }, 500);
+      }
+
+      const playerStats = result.value.response[0]?.players.find(p => p.player.id === playerId);
+      if (!playerStats) {
+        return c.json({ error: 'Player stats not found for this match' }, 404);
+      }
+
+      return c.json({ stats: playerStats.statistics[0] });
+    } catch (error) {
+      console.error('Error fetching player stats:', error);
+      return c.json({ error: 'Failed to fetch player stats' }, 500);
+    }
+  },
 
   async createPlayer(c: Context) {
     try {

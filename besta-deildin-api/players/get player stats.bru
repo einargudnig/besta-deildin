@@ -1,0 +1,20 @@
+meta {
+  name: get player stats
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:3000/api/player/:id/stats?matchId=1332721&teamId=274
+  body: none
+  auth: inherit
+}
+
+params:query {
+  matchId: 1332721
+  teamId: 274
+}
+
+params:path {
+  id: 89714
+}
